@@ -3,4 +3,5 @@ pandas
 requests
 pytz
 pybaseball
-statsapi
+git+https://github.com/toddrob99/MLB-StatsAPI.git
+
