@@ -63,6 +63,7 @@ with tab2:
     st.subheader("Your Bet History")
 
     df = get_data(sheet)
+
     if df.empty:
         st.info("No data available yet.")
     else:
@@ -73,9 +74,19 @@ with tab2:
         filtered_df = df[df["Result"].isin(status_filter)]
         st.dataframe(filtered_df, use_container_width=True)
 
+        # 💵 Profit + Bankroll Stats (only from completed bets)
         completed_bets = df[df["Result"].isin(["Won", "Lost"])]
         total_in = completed_bets["Payout"].sum()
         total_out = completed_bets["Amount"].sum()
         net_profit = total_in - total_out
         current_bankroll = STARTING_BANKROLL + net_profit
+        roi = (net_profit / total_out * 100) if total_out > 0 else 0.0
+
+        st.markdown("### 📈 Summary Stats")
+        st.markdown(f"💰 **Money In (Winnings):** ${total_in:,.2f}")
+        st.markdown(f"📤 **Money Out (All Bets):** ${total_out:,.2f}")
+        st.markdown(f"📈 **Net Profit/Loss:** ${net_profit:,.2f}")
+        st.markdown(f"🏦 **Current Bankroll:** ${current_bankroll:,.2f} (Starting: ${STARTING_BANKROLL})")
+        st.markdown(f"📊 **ROI:** {roi:.2f}%")
+
 
