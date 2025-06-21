@@ -1,100 +1,80 @@
-# pages/3_Trend_Explorer.py
 import streamlit as st
 import pandas as pd
-from pybaseball import statcast, playerid_reverse_lookup
-from datetime import date
-import json
 import os
+from datetime import date
+from pybaseball import statcast, playerid_reverse_lookup
 
-st.title("📊 Trend Explorer: First Pitch Outcome Stats")
-st.caption("Built from live 2025 Statcast data. Filter hitters by actual first pitch outcomes and save targets.")
+CSV_FILE = "first_pitch_data_2025.csv"
 
-# --- Load Target List ---
-TARGET_FILE = "target_hitters.json"
+@st.cache_data
 
-def load_targets():
-    if os.path.exists(TARGET_FILE):
-        with open(TARGET_FILE, "r") as f:
-            return json.load(f)
-    return []
-
-def save_targets(target_list):
-    with open(TARGET_FILE, "w") as f:
-        json.dump(target_list, f)
-
-# Initialize target list
-if "target_hitters" not in st.session_state:
-    st.session_state["target_hitters"] = load_targets()
-
-# --- Load Statcast First Pitch Data ---
-@st.cache_data(ttl=3600)
 def load_first_pitch_data():
+    if os.path.exists(CSV_FILE):
+        return pd.read_csv(CSV_FILE)
+
+    # Pull full 2025 season data
     start = "2025-03-20"
     end = date.today().strftime("%Y-%m-%d")
     df = statcast(start, end)
-    df = df[df["pitch_number"] == 1]
-    df = df.dropna(subset=["at_bat_number", "batter", "game_pk"])
-    df = df.drop_duplicates(subset=["game_pk", "at_bat_number", "batter"])
 
-    # Add batter_name from batter ID
+    # First pitch only
+    df = df[df["pitch_number"] == 1].copy()
+
+    # Add batter name from ID
     batter_ids = df["batter"].dropna().unique()
     id_map = playerid_reverse_lookup(batter_ids)
-    id_map = id_map[["key_mlbam", "name_last", "name_first"]]
+    id_map = id_map[["key_mlbam", "name_first", "name_last"]]
     id_map["batter_name"] = id_map["name_first"] + " " + id_map["name_last"]
     df = df.merge(id_map[["key_mlbam", "batter_name"]], left_on="batter", right_on="key_mlbam", how="left")
 
+    df.to_csv(CSV_FILE, index=False)
     return df
 
-with st.spinner("Pulling 2025 Statcast data..."):
+st.title("📊 Trend Explorer – First Pitch Performance")
+
+# Refresh button
+if st.sidebar.button("🔄 Refresh Data"):
+    if os.path.exists(CSV_FILE):
+        os.remove(CSV_FILE)
+    st.cache_data.clear()
+    st.experimental_rerun()
+
+with st.spinner("Loading 2025 first pitch data..."):
     df = load_first_pitch_data()
 
-# --- Calculate Outcomes ---
+# Group by batter and calculate stats
 grouped = df.groupby("batter_name").agg(
     total_fp=("pitch_type", "count"),
     balls=("description", lambda x: (x == "ball").sum()),
     singles=("events", lambda x: (x == "single").sum()),
-    xb_hits=("events", lambda x: x.isin(["double", "triple", "home_run"]).sum())
+    xbh=("events", lambda x: x.isin(["double", "triple", "home_run"]).sum()),
+    hits=("events", lambda x: x.isin(["single", "double", "triple", "home_run"]).sum()),
+    fouls=("description", lambda x: (x == "foul").sum()),
+    in_play=("description", lambda x: (x == "hit_into_play").sum()),
+    swings=("description", lambda x: x.isin(["foul", "swinging_strike", "swinging_strike_blocked", "hit_into_play"]).sum()),
 )
-grouped["others"] = grouped["total_fp"] - grouped["balls"] - grouped["singles"] - grouped["xb_hits"]
 
-# Percentages
-grouped["ball_pct"] = grouped["balls"] / grouped["total_fp"]
-grouped["single_pct"] = grouped["singles"] / grouped["total_fp"]
-grouped["xbh_pct"] = grouped["xb_hits"] / grouped["total_fp"]
-grouped["other_pct"] = grouped["others"] / grouped["total_fp"]
+grouped["in_play_pct"] = (grouped["in_play"] / grouped["total_fp"]).round(3)
+grouped["swing_pct"] = (grouped["swings"] / grouped["total_fp"]).round(3)
+grouped = grouped.reset_index()
 
-# Filter
-grouped = grouped[grouped["total_fp"] >= 25].round(3).reset_index()
+st.subheader("Search and Filter First Pitch Hitters")
 
-# --- Sidebar Filters ---
-st.sidebar.header("🔎 Filter Hitters")
-min_fp = st.sidebar.slider("Min First Pitch ABs", 10, 100, 25)
-min_ball = st.sidebar.slider("Min Ball %", 0.0, 1.0, 0.0)
-min_single = st.sidebar.slider("Min Single %", 0.0, 1.0, 0.0)
-min_xbh = st.sidebar.slider("Min XBH %", 0.0, 1.0, 0.0)
+min_fp = st.sidebar.slider("Minimum First Pitch ABs", 5, 100, 10)
+filtered = grouped[grouped["total_fp"] >= min_fp]
 
-filtered = grouped[
-    (grouped["total_fp"] >= min_fp) &
-    (grouped["ball_pct"] >= min_ball) &
-    (grouped["single_pct"] >= min_single) &
-    (grouped["xbh_pct"] >= min_xbh)
-]
+# 🔍 Add batter name search above table
+search_query = st.text_input("Search by batter name:")
+if search_query:
+    filtered = filtered[filtered["batter_name"].str.contains(search_query, case=False)]
 
-# --- Add Targets ---
-st.subheader("📋 Eligible First Pitch Standouts")
-selection = st.multiselect("Add hitters to your target list:", filtered["batter_name"].tolist())
+# Show sortable table using st.dataframe
+st.dataframe(
+    filtered.sort_values("in_play_pct", ascending=False),
+    use_container_width=True,
+    hide_index=True
+)
 
-for hitter in selection:
-    if hitter not in st.session_state["target_hitters"]:
-        st.session_state["target_hitters"].append(hitter)
-        save_targets(st.session_state["target_hitters"])
-        st.success(f"{hitter} added to your target list.")
-
-# --- Show Table ---
-st.dataframe(filtered[[
-    "batter_name", "total_fp", "ball_pct", "single_pct", "xbh_pct", "other_pct"
-]])
-
-# --- Show Saved List ---
-with st.expander("🎯 Current Target Hitters"):
-    st.write(st.session_state["target_hitters"])
+# Show total saved targets if any
+target_list = st.session_state.get("target_hitters", set())
+st.success(f"✅ {len(target_list)} hitters currently on your target list.")
