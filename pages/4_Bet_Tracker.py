@@ -77,4 +77,5 @@ with tab2:
         total_in = completed_bets["Payout"].sum()
         total_out = completed_bets["Amount"].sum()
         net_profit = total_in - total_out
-        current_bankroll = STA_
+        current_bankroll = STARTING_BANKROLL + net_profit
+
