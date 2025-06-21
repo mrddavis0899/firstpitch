@@ -4,4 +4,5 @@ requests
 pytz
 pybaseball
 git+https://github.com/toddrob99/MLB-StatsAPI.git
-
+gspread
+oauth2client
