@@ -1,18 +1,17 @@
-import streamlit as st 
+import streamlit as st
 import pandas as pd
 from datetime import datetime
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2 import service_account
 
 # ---------- CONFIG ----------
 SPREADSHEET_NAME = "Fanduel Bet Tracker"
 STARTING_BANKROLL = 83.0
-CREDENTIALS_FILE = "your_credentials.json"
 
-# ---------- SETUP ----------
+# ---------- GOOGLE SHEETS CONNECTION ----------
 def connect_to_gsheet():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
+    creds = service_account.Credentials.from_service_account_info(st.secrets["google"], scopes=scope)
     client = gspread.authorize(creds)
     sheet = client.open(SPREADSHEET_NAME).sheet1
     return sheet
@@ -78,3 +77,4 @@ with tab2:
         total_in = completed_bets["Payout"].sum()
         total_out = completed_bets["Amount"].sum()
         net_profit = total_in - total_out
+        current_bankroll = STA_
