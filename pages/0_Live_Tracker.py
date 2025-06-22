@@ -41,13 +41,10 @@ st.caption(f"🕒 Last Checked: {datetime.now(eastern).strftime('%I:%M %p').lstr
 def get_live_games():
     eastern = pytz.timezone("US/Eastern")
     now = datetime.now(eastern)
-
-    # If it's after midnight but before 4am, pull yesterday's games
     if now.hour < 4:
         target_date = (now - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
     else:
         target_date = now.strftime("%Y-%m-%d")
-
     url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={target_date}&hydrate=team,linescore"
     r = requests.get(url)
     data = r.json()
@@ -82,19 +79,12 @@ for game in live_games:
     batting_side = "away" if is_top else "home"
     batting_team = game.get("teams", {}).get(batting_side, {}).get("team", {}).get("name", "")
 
-    # Boxscore
     boxscore_url = f"https://statsapi.mlb.com/api/v1/game/{game_id}/boxscore"
     boxscore = requests.get(boxscore_url).json()
     team_box = boxscore.get("teams", {}).get(batting_side, {})
     batters = team_box.get("batters", [])
     players = team_box.get("players", {})
 
-    if not batters:
-        debug_lines.append(f"⚠️ No batters found for {batting_team}")
-    if not players:
-        debug_lines.append(f"⚠️ No players data for {batting_team}")
-
-    # Live play-by-play
     feed_url = f"https://statsapi.mlb.com/api/v1.1/game/{game_id}/feed/live"
     feed = requests.get(feed_url).json()
     live_play = feed.get("liveData", {}).get("plays", {}).get("currentPlay", {})
@@ -112,8 +102,14 @@ for game in live_games:
     debug_lines.append(f"🧠 {batting_team} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}")
     debug_lines.append(f"   Current Batter: {current_batter_name} (Index {current_index})")
 
-    # ✅ Always check who is due to lead off next inning (now or soon)
-    leadoff_index = (current_index + (1 if outs >= 3 else 0)) % len(batters)
+    # Calculate leadoff hitter for next inning using correct logic
+    if outs < 3:
+        next_batter_index = (current_index + 1) % len(batters)
+        next_batter_id = batters[next_batter_index]
+        leadoff_index = (next_batter_index + (3 - outs)) % len(batters)
+    else:
+        leadoff_index = (current_index + 1) % len(batters)
+    
     leadoff_id = batters[leadoff_index]
     leadoff_key = f"ID{leadoff_id}"
     leadoff_name = players.get(leadoff_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {leadoff_id}")
@@ -121,20 +117,19 @@ for game in live_games:
     debug_lines.append(f"   ⏭️ Leadoff Next Inning: {leadoff_name}")
 
     if leadoff_name.lower() in normalized_targets:
-        alert_key = (game_id, inning + (1 if outs >= 3 else 0), leadoff_name)
+        alert_key = (game_id, inning + 1, leadoff_name)
         if alert_key not in st.session_state.alerts_fired:
             st.session_state.alerts_fired.add(alert_key)
             detected_time = datetime.now(eastern).strftime('%I:%M %p').lstrip('0')
             alert = {
                 "Batter": leadoff_name,
                 "Team": batting_team,
-                "Will Lead Off Inning": inning + (1 if outs >= 3 else 0),
+                "Will Lead Off Inning": inning + 1,
                 "Detected At": detected_time
             }
             alerts.append(alert)
             st.session_state.pinned_alerts.append(alert)
 
-    # For completeness: show next batter as well
     if current_index + 1 < len(batters):
         next_batter_id = batters[current_index + 1]
     else:

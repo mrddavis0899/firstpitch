@@ -37,7 +37,7 @@ if st.sidebar.button("🔄 Refresh Data"):
     if os.path.exists(CSV_FILE):
         os.remove(CSV_FILE)
     st.cache_data.clear()
-    st.experimental_rerun()
+    st.rerun()
 
 with st.spinner("Loading 2025 first pitch data..."):
     df = load_first_pitch_data()
