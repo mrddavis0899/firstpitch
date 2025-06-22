@@ -4,13 +4,17 @@ import requests
 from datetime import datetime
 import pytz
 import time
+from unidecode import unidecode
 
 st.set_page_config(page_title="Live Tracker", layout="wide")
 st.title("🔴 Live First Pitch Leadoff Tracker")
 
+def normalize(name):
+    return unidecode(name).lower().strip()
+
 # Load target hitters from session
 target_hitters = st.session_state.get("target_hitters", set())
-normalized_targets = {name.lower() for name in target_hitters}
+normalized_targets = {normalize(name) for name in target_hitters}
 
 # Track already alerted combos
 if "alerts_fired" not in st.session_state:
@@ -39,7 +43,6 @@ st.caption(f"🕒 Last Checked: {datetime.now(eastern).strftime('%I:%M %p').lstr
 
 # Pull live schedule data (with after-midnight support)
 def get_live_games():
-    eastern = pytz.timezone("US/Eastern")
     now = datetime.now(eastern)
     if now.hour < 4:
         target_date = (now - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
@@ -102,21 +105,20 @@ for game in live_games:
     debug_lines.append(f"🧠 {batting_team} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}")
     debug_lines.append(f"   Current Batter: {current_batter_name} (Index {current_index})")
 
-    # Calculate leadoff hitter for next inning using correct logic
+    # Calculate leadoff hitter for next inning
     if outs < 3:
         next_batter_index = (current_index + 1) % len(batters)
-        next_batter_id = batters[next_batter_index]
         leadoff_index = (next_batter_index + (3 - outs)) % len(batters)
     else:
         leadoff_index = (current_index + 1) % len(batters)
-    
+
     leadoff_id = batters[leadoff_index]
     leadoff_key = f"ID{leadoff_id}"
     leadoff_name = players.get(leadoff_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {leadoff_id}")
 
     debug_lines.append(f"   ⏭️ Leadoff Next Inning: {leadoff_name}")
 
-    if leadoff_name.lower() in normalized_targets:
+    if normalize(leadoff_name) in normalized_targets:
         alert_key = (game_id, inning + 1, leadoff_name)
         if alert_key not in st.session_state.alerts_fired:
             st.session_state.alerts_fired.add(alert_key)
@@ -138,7 +140,7 @@ for game in live_games:
     next_batter_name = players.get(next_player_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {next_batter_id}")
     debug_lines.append(f"   Next Batter: {next_batter_name}")
 
-    if next_batter_name.lower() in normalized_targets:
+    if normalize(next_batter_name) in normalized_targets:
         debug_lines.append(f"   🎯 {next_batter_name} is a TARGET!")
 
 # Show alerts
