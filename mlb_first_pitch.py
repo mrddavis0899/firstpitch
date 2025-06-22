@@ -1,14 +1,10 @@
-import os  # <-- Import os module to handle file system operations
+import os
 import pandas as pd
 import streamlit as st
 
 # Load the data from your existing dataset (you already have this from Trend Explorer)
-# You can load it from a CSV, database, or any other persistent storage you use.
-# Assuming it's a CSV file with the first-pitch data for batters
-# Update the file path to wherever your data is stored
 CSV_FILE = "first_pitch_data_2025.csv"
 
-# Check if the file exists
 if os.path.exists(CSV_FILE):
     df = pd.read_csv(CSV_FILE)
     df["game_date"] = pd.to_datetime(df["game_date"])
