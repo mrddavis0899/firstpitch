@@ -1,5 +1,5 @@
 import streamlit as st
-import os  # <-- Import the os module here
+import os
 from mlb_first_pitch import get_hot_hitters  # Import the function from mlb_first_pitch.py
 
 # Automatically update games_today.csv on app startup
@@ -20,19 +20,23 @@ Welcome to **FirstPitch** — your MLB real-time tracker and trend analyzer for 
 - In **Upcoming Games**, find matchups where hitters face favorable pitchers on the first pitch.
 """)
 
-# Call the get_hot_hitters function to retrieve the hot hitters
-hot_hitters = get_hot_hitters()
+# Add a button to refresh Hot Hitters
+refresh_button = st.button("Refresh Hot Hitters")
 
-if hot_hitters is not None:
-    if not hot_hitters.empty:
-        st.subheader("🔥 Hot Hitters – Last 5 Games (First Pitch Only)")
-        st.dataframe(hot_hitters.rename(columns={
-            "batter_name": "Player",
-            "total_pas": "First Pitch PAs",
-            "successes": "In-Play/Hit Outcomes"
-        }), hide_index=True, use_container_width=True)
+# Fetch Hot Hitters only when the button is pressed
+if refresh_button:
+    hot_hitters = get_hot_hitters()  # Call the function to get the latest hot hitters
+
+    if hot_hitters is not None:
+        if not hot_hitters.empty:
+            st.subheader("🔥 Hot Hitters – Last 5 Games (First Pitch Only)")
+            st.dataframe(hot_hitters.rename(columns={
+                "batter_name": "Player",
+                "total_pas": "First Pitch PAs",
+                "successes": "In-Play/Hit Outcomes"
+            }), hide_index=True, use_container_width=True)
+        else:
+            st.subheader("🔥 Hot Hitters")
+            st.info("No hot hitters found in the last 5 games based on current first-pitch stats.")
     else:
-        st.subheader("🔥 Hot Hitters")
-        st.info("No hot hitters found in the last 5 games based on current first-pitch stats.")
-else:
-    st.error("First-pitch data not found. Please ensure the dataset is available.")
+        st.error("First-pitch data not found. Please ensure the dataset is available.")
