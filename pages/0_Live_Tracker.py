@@ -61,17 +61,11 @@ debug_lines = []
 batters = None
 players = {}
 
-# Show all game statuses
-for g in games:
-    away = g.get("teams", {}).get("away", {}).get("team", {}).get("name", "Away")
-    home = g.get("teams", {}).get("home", {}).get("team", {}).get("name", "Home")
-    status = g.get("status", {}).get("detailedState", "Unknown")
-    debug_lines.append(f"📋 {away} vs {home} — Status: {status}")
-
-# Filter in-progress games
+# Show only live games
 live_games = [g for g in games if g.get("status", {}).get("detailedState") == "In Progress"]
 debug_lines.append(f"📊 Found {len(games)} games today, {len(live_games)} currently In Progress.")
 
+# Display live game details
 for game in live_games:
     game_id = game.get("gamePk")
     linescore = game.get("linescore", {})
@@ -94,15 +88,28 @@ for game in live_games:
     matchup = live_play.get("matchup", {})
     current_batter_id = matchup.get("batter", {}).get("id")
 
-    try:
-        current_index = batters.index(current_batter_id)
-    except:
-        current_index = 0
-
-    player_key = f"ID{current_batter_id}"
-    current_batter_name = players.get(player_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {current_batter_id}")
+    current_batter_name = players.get(f"ID{current_batter_id}", {}).get("person", {}).get("fullName", "❓ Unknown")
+    current_index = batters.index(current_batter_id)
 
     debug_lines.append(f"🧠 {batting_team} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}")
+    debug_lines.append(f"   Current Batter: {current_batter_name} (Index {current_index})")
+
+    # Check if current_batter_id exists in batters list
+    if current_batter_id not in batters:
+        debug_lines.append(f"❌ Current Batter ID {current_batter_id} not found in batters list. Skipping this play.")
+        continue  # Skip if the current batter ID isn't in the list of batters
+
+    # Function to check if the final out should be considered valid (e.g., even if it's a fielder's choice)
+    def is_final_out(play_description):
+        # Consider the batter as the 3rd out even if it's a fielder's choice
+        if "fielder's choice" in play_description.lower():
+            return True  # Count this as an out for the batter
+        return True  # Otherwise, count as an out for the batter
+
+    # Increment the outs based on valid outs (not fielder's choice)
+    if is_final_out(live_play.get("result", {}).get("description", "")):
+        outs += 1
+
     debug_lines.append(f"   Current Batter: {current_batter_name} (Index {current_index})")
 
     # Exclude pitcher from the list of batters
@@ -158,10 +165,26 @@ for game in live_games:
     else:
         debug_lines.append(f"   🚫 No alert: Not 3rd out yet.")
 
-# Show alerts
+# Show alerts with improved styling
 if alerts:
     st.subheader("🚨 Leadoff Alert: Target Hitter Leading Off Next Inning")
-    st.table(pd.DataFrame(alerts))
+    for alert in alerts:
+        batter = alert["Batter"]
+        team = alert["Team"]
+        inning = alert["Will Lead Off Inning"]
+        detected_time = alert["Detected At"]
+
+        alert_message = f"""
+        **🧨 {batter}** from the **{team}** is set to lead off the **{inning}** inning.
+        ⏰ Detected at **{detected_time}**.
+        """
+        
+        # Make the alert more noticeable with a colorful background, bold font, and some padding
+        st.markdown(f'''
+        <div style="background-color: #ff6347; color: white; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
+            {alert_message}
+        </div>
+        ''', unsafe_allow_html=True)
 else:
     st.info("No target hitters currently set to lead off next inning.")
 
@@ -170,25 +193,13 @@ if st.session_state.pinned_alerts:
     st.subheader("📌 Pinned Alerts")
     st.table(pd.DataFrame(st.session_state.pinned_alerts))
 
-# Debug section
-with st.expander("🔍 Debug Mode: Show Game State"):
+# Debug section - Show live game status
+with st.expander("🔍 Live Game Status"):
     if debug_lines:
         for line in debug_lines:
             st.write(line)
     else:
-        st.write("ℹ️ No debug information available yet.")
-
-    st.write("\n🧪 Batters list:")
-    if batters:
-        st.write(batters)
-    else:
-        st.write("⚠️ No batters found — possibly an issue with API response.")
-
-    st.write("\n🧪 Players dictionary keys:")
-    if players:
-        st.json(list(players.keys())[:10])
-    else:
-        st.write("⚠️ No player data — possibly an issue with API response.")
+        st.write("ℹ️ No live games found.")
 
 # Auto-refresh
 time.sleep(refresh_rate)
