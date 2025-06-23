@@ -2,3 +2,5 @@ your_credentials.json
 __pycache__/
 *.pyc
 .streamlit/
+first_pitch_data_2025.csv
+
