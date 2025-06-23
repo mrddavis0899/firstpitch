@@ -105,43 +105,58 @@ for game in live_games:
     debug_lines.append(f"🧠 {batting_team} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}")
     debug_lines.append(f"   Current Batter: {current_batter_name} (Index {current_index})")
 
-    # Calculate leadoff hitter for next inning
-    if outs < 3:
-        next_batter_index = (current_index + 1) % len(batters)
-        leadoff_index = (next_batter_index + (3 - outs)) % len(batters)
+    # Exclude pitcher from the list of batters
+    valid_batters = [batter for batter in batters if players.get(f"ID{batter}", {}).get("person", {}).get("primaryPosition", {}).get("code") != "P"]
+
+    # Leadoff Hitter Logic: Calculate who will lead off next inning (same team)
+    projected_leadoff_name = ""
+    if outs == 0:
+        # If no outs, the next batter will be the leadoff hitter for the next inning
+        projected_leadoff_index = (current_index + 1) % len(valid_batters)
+        projected_leadoff_name = players.get(f"ID{valid_batters[projected_leadoff_index]}", {}).get("person", {}).get("fullName", "❓ Unknown")
+
+    elif outs == 1:
+        # If 1 out, the leadoff hitter will be 2 batters away
+        projected_leadoff_index = (current_index + 2) % len(valid_batters)
+        projected_leadoff_name = players.get(f"ID{valid_batters[projected_leadoff_index]}", {}).get("person", {}).get("fullName", "❓ Unknown")
+
+    elif outs == 2:
+        # If 2 outs, the leadoff hitter will be 1 batter away
+        projected_leadoff_index = (current_index + 1) % len(valid_batters)
+        projected_leadoff_name = players.get(f"ID{valid_batters[projected_leadoff_index]}", {}).get("person", {}).get("fullName", "❓ Unknown")
+
     else:
-        leadoff_index = (current_index + 1) % len(batters)
+        # If 3 outs, reset to first batter at top of next inning
+        projected_leadoff_name = players.get(f"ID{valid_batters[0]}", {}).get("person", {}).get("fullName", "❓ Unknown")
 
-    leadoff_id = batters[leadoff_index]
-    leadoff_key = f"ID{leadoff_id}"
-    leadoff_name = players.get(leadoff_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {leadoff_id}")
+    # Add projected leadoff hitter info to debug section
+    debug_lines.append(f"   ⏭️ Projected Leadoff Next Inning: {projected_leadoff_name}")
 
-    debug_lines.append(f"   ⏭️ Leadoff Next Inning: {leadoff_name}")
+    # Leadoff Hitter Logic: Calculate who will lead off next inning after the 3rd out
+    if outs == 3:
+        leadoff_index = 0  # Always start from the first batter at the top of the next inning
+        leadoff_id = valid_batters[leadoff_index]
+        leadoff_key = f"ID{leadoff_id}"
+        leadoff_name = players.get(leadoff_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {leadoff_id}")
 
-    if normalize(leadoff_name) in normalized_targets:
-        alert_key = (game_id, inning + 1, leadoff_name)
-        if alert_key not in st.session_state.alerts_fired:
-            st.session_state.alerts_fired.add(alert_key)
-            detected_time = datetime.now(eastern).strftime('%I:%M %p').lstrip('0')
-            alert = {
-                "Batter": leadoff_name,
-                "Team": batting_team,
-                "Will Lead Off Inning": inning + 1,
-                "Detected At": detected_time
-            }
-            alerts.append(alert)
-            st.session_state.pinned_alerts.append(alert)
+        debug_lines.append(f"   ⏭️ Leadoff Next Inning: {leadoff_name}")
 
-    if current_index + 1 < len(batters):
-        next_batter_id = batters[current_index + 1]
+        if normalize(leadoff_name) in normalized_targets:
+            alert_key = (game_id, inning + 1, leadoff_name)
+            if alert_key not in st.session_state.alerts_fired:
+                st.session_state.alerts_fired.add(alert_key)
+                detected_time = datetime.now(eastern).strftime('%I:%M %p').lstrip('0')
+                alert = {
+                    "Batter": leadoff_name,
+                    "Team": batting_team,
+                    "Will Lead Off Inning": inning + 1,
+                    "Detected At": detected_time
+                }
+                alerts.append(alert)
+                st.session_state.pinned_alerts.append(alert)
+
     else:
-        next_batter_id = batters[0]
-    next_player_key = f"ID{next_batter_id}"
-    next_batter_name = players.get(next_player_key, {}).get("person", {}).get("fullName", f"❓ Unknown - ID: {next_batter_id}")
-    debug_lines.append(f"   Next Batter: {next_batter_name}")
-
-    if normalize(next_batter_name) in normalized_targets:
-        debug_lines.append(f"   🎯 {next_batter_name} is a TARGET!")
+        debug_lines.append(f"   🚫 No alert: Not 3rd out yet.")
 
 # Show alerts
 if alerts:
