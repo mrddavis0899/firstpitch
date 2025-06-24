@@ -7,6 +7,14 @@ import os
 
 st.title("🗓️ Upcoming Games")
 
+# Refresh button
+if st.sidebar.button("🔄 Refresh Lineups"):
+    st.rerun()
+
+# Display last check time
+now_est = datetime.now(pytz.timezone("US/Eastern")).strftime("%Y-%m-%d %I:%M:%S %p EST")
+st.markdown(f"⏰ **Lineups last checked:** {now_est}")
+
 def convert_to_est(dt_str):
     try:
         dt = datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
@@ -15,11 +23,9 @@ def convert_to_est(dt_str):
     except:
         return "TBD"
 
-# Ensure data folder exists
+# Ensure /data folder exists
 os.makedirs("data", exist_ok=True)
 projected_pitchers_today = set()
-
-# Today's games
 today = datetime.now().strftime("%Y-%m-%d")
 games = statsapi.schedule(date=today)
 
@@ -39,42 +45,52 @@ else:
             hp = hp.get("fullName", hp) if isinstance(hp, dict) else hp
             stime = convert_to_est(game.get("game_datetime", ""))
 
-            # Track pitchers for Trend Explorer
+            # Track pitchers
             if ap and ap != "TBD":
                 projected_pitchers_today.add(ap)
             if hp and hp != "TBD":
                 projected_pitchers_today.add(hp)
 
-            # Default to "TBD" unless we successfully get leadoff names
-            top1 = "TBD"
-            bot1 = "TBD"
-
-            # Try to pull leadoff hitters if batting orders exist
+            # Load game data
             gid = game["game_id"]
             gd = statsapi.get("game", {"gamePk": gid})
+            away_players = gd.get("away", {}).get("players", {})
+            home_players = gd.get("home", {}).get("players", {})
             ao = gd.get("away", {}).get("battingOrder", [])
             ho = gd.get("home", {}).get("battingOrder", [])
-            apdict = gd.get("away", {}).get("players", {})
-            hpdict = gd.get("home", {}).get("players", {})
-            if ao:
-                top1 = apdict.get(f"ID{ao[0]}", {}).get("person", {}).get("fullName", "TBD")
-            if ho:
-                bot1 = hpdict.get(f"ID{ho[0]}", {}).get("person", {}).get("fullName", "TBD")
 
-            top1_lbl = "🎯 " + top1 if top1.lower() in norm_targets else top1
-            bot1_lbl = "🎯 " + bot1 if bot1.lower() in norm_targets else bot1
+            def extract_leadoff(order, players, is_home):
+                if order:
+                    return players.get(f"ID{order[0]}", {}).get("person", {}).get("fullName", "TBD")
+                else:
+                    # Try to find jersey numbers 1–9 (batting order placeholders)
+                    for p in players.values():
+                        if p.get("battingOrder", 9999) == 1:
+                            name = p.get("person", {}).get("fullName", "TBD")
+                            return f"⚠️ {name}"
+                return "TBD"
+
+            top1 = extract_leadoff(ao, away_players, False)
+            bot1 = extract_leadoff(ho, home_players, True)
+
+            def format_name(name):
+                clean = name.replace("⚠️", "").strip()
+                label = f"🎯 {name}" if clean.lower() in norm_targets else name
+                if "⚠️" in name:
+                    return f'<span style="color: goldenrod;">{label}</span>'
+                return label
 
             label = f"{away} @ {home} – {stime}"
             with st.expander(label):
-                st.markdown(f"**Top1:** {top1_lbl} vs. {hp}")
-                st.markdown(f"**Bot1:** {bot1_lbl} vs. {ap}")
+                st.markdown(f"**Top1:** {format_name(top1)} vs. {hp}", unsafe_allow_html=True)
+                st.markdown(f"**Bot1:** {format_name(bot1)} vs. {ap}", unsafe_allow_html=True)
 
-                if top1 == "TBD" or bot1 == "TBD":
-                    st.info("✅ Lineups will populate closer to game time. Check back ~1 hour before first pitch.")
+                if "TBD" in top1 or "TBD" in bot1:
+                    st.info("🕒 Lineups not yet posted. Projections shown in yellow if available.")
 
         except Exception as e:
             st.error(f"Error processing {away} @ {home}: {e}")
 
-    # Save projected pitchers to file
+    # Save pitcher list
     with open("data/projected_pitchers_today.json", "w") as f:
         json.dump(sorted(projected_pitchers_today), f, indent=2)
