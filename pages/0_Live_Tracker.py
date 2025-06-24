@@ -109,9 +109,9 @@ for game in live_games:
     block_lines = [f"<strong>🧠 {team_name} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}</strong>",
                    f"Current Batter: {current_name} (Index {current_index})"]
 
-    # Always determine next batter
-    next_index = (valid_batters.index(batter_id) + 1) % len(valid_batters)
-    next_id = valid_batters[next_index]
+    # Smarter projected leadoff logic based on current outs
+    projected_index = (valid_batters.index(batter_id) + (3 - outs)) % len(valid_batters)
+    next_id = valid_batters[projected_index]
     next_name = players.get(f"ID{next_id}", {}).get("person", {}).get("fullName", "❓ Unknown")
 
     leadoff_memory[game_id] = {
