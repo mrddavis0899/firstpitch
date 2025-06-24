@@ -88,8 +88,18 @@ for game in live_games:
     if batter_id not in batters:
         continue
 
-    # Filter out pitchers
-    valid_batters = [b for b in batters if players.get(f"ID{b}", {}).get("person", {}).get("primaryPosition", {}).get("code") != "P"]
+    # Ultra-safe filtering of valid batters
+    valid_batters = []
+    for b in batters:
+        player = players.get(f"ID{b}", {})
+        pos_code = player.get("person", {}).get("primaryPosition", {}).get("code", "")
+        stats = player.get("stats", {})
+        has_batting_stats = any("batting" in stat_type for stat_type in stats.keys())
+        is_in_lineup = "battingOrder" in player
+
+        if pos_code != "P" and has_batting_stats and is_in_lineup:
+            valid_batters.append(b)
+
     if not valid_batters:
         continue
 
