@@ -1,42 +1,32 @@
 import streamlit as st
-import os
-from mlb_first_pitch import get_hot_hitters  # Import the function from mlb_first_pitch.py
+from mlb_first_pitch import get_hot_hitters
+import pandas as pd
 
-# Automatically update games_today.csv on app startup
-if not os.path.exists("games_today.csv") or os.stat("games_today.csv").st_size == 0:
-    with st.spinner("📅 Pulling today's MLB games..."):
-        from update_games_and_pitchers import update_csvs
-        update_csvs()
-        st.success("✅ Updated today's games.")
+st.set_page_config(page_title="FirstPitch Dashboard", layout="wide")
+st.title("\u26be FirstPitch Dashboard")
+st.markdown("Welcome to the FirstPitch Dashboard!")
 
-# Navigation landing page
-st.set_page_config(page_title="FirstPitch", layout="wide")
+st.markdown("---")
 
-st.title("⚾️ FirstPitch Home")
-st.markdown("""
-Welcome to **FirstPitch** — your MLB real-time tracker and trend analyzer for first-pitch betting.
-- Use the **Live Tracker** tab to catch when your target hitters are leading off next.
-- The **Trend Explorer** helps you find hot hitters by filtering swing rates, contact %, and more.
-- In **Upcoming Games**, find matchups where hitters face favorable pitchers on the first pitch.
-""")
+# Checkbox to include/exclude "ball" in success criteria
+include_ball = st.checkbox("Include 'Ball' as a Successful First Pitch?", value=True)
 
-# Add a button to refresh Hot Hitters
-refresh_button = st.button("Refresh Hot Hitters")
+# Refresh hot hitters
+if st.button("Refresh Hot Hitters"):
+    st.session_state.hot_hitters = get_hot_hitters(include_ball=include_ball)
 
-# Fetch Hot Hitters only when the button is pressed
-if refresh_button:
-    hot_hitters = get_hot_hitters()  # Call the function to get the latest hot hitters
+# Display hot hitters if available
+if "hot_hitters" in st.session_state:
+    hot_hitters = st.session_state.hot_hitters
 
-    if hot_hitters is not None:
-        if not hot_hitters.empty:
-            st.subheader("🔥 Hot Hitters – Last 5 Games (First Pitch Only)")
-            st.dataframe(hot_hitters.rename(columns={
-                "batter_name": "Player",
-                "total_pas": "First Pitch PAs",
-                "successes": "In-Play/Hit Outcomes"
-            }), hide_index=True, use_container_width=True)
-        else:
-            st.subheader("🔥 Hot Hitters")
-            st.info("No hot hitters found in the last 5 games based on current first-pitch stats.")
+    st.subheader("Top 5 Hot Hitters (Last 5 PAs with 3+ First Pitch Successes)")
+    if not hot_hitters.empty:
+        st.dataframe(
+            hot_hitters.head(5)[["Batter", "First Pitch PAs", "In-Play/Hit Outcome"]],
+            use_container_width=True,
+            hide_index=True
+        )
     else:
-        st.error("First-pitch data not found. Please ensure the dataset is available.")
+        st.info("No hot hitters found with current criteria.")
+else:
+    st.info("Click 'Refresh Hot Hitters' to load data.")

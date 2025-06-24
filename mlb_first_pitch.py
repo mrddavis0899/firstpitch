@@ -1,41 +1,56 @@
-import os
 import pandas as pd
-import streamlit as st
+from datetime import datetime, timedelta
 
-# Function to get Hot Hitters
-def get_hot_hitters():
-    # Load the data from your existing dataset (you already have this from Trend Explorer)
-    CSV_FILE = "first_pitch_data_2025.csv"
+def get_hot_hitters(csv_path="first_pitch_data_2025.csv", pitcher_csv="active_pitchers_2025.csv", include_ball=True):
+    df = pd.read_csv(csv_path)
 
-    if os.path.exists(CSV_FILE):
-        df = pd.read_csv(CSV_FILE)
-        df["game_date"] = pd.to_datetime(df["game_date"])
+    # Convert game_date to datetime and filter by last 7 days
+    df["game_date"] = pd.to_datetime(df["game_date"], errors="coerce")
+    last_week = datetime.now() - timedelta(days=7)
+    df = df[df["game_date"] >= last_week]
 
-        # Filter to only first-pitch events
-        df = df[df["pitch_number"] == 1]
+    # Remove rows without batter name
+    if "batter_name" not in df.columns:
+        df["batter_name"] = df["player_name"]
+    df = df[df["batter_name"].notna()]
 
-        # Focus on batters only by excluding pitchers (assuming 'stand' indicates batting)
-        df = df[df["stand"].notnull()]
+    # Exclude pitchers
+    try:
+        pitchers = pd.read_csv(pitcher_csv)
+        pitcher_names = pitchers["name"].str.lower().str.strip().unique()
+        df = df[~df["batter_name"].str.lower().str.strip().isin(pitcher_names)]
+    except Exception as e:
+        print("⚠️ Pitcher filter skipped due to error:", e)
 
-        # Filter successful first-pitch outcomes (ball, single, double, home run, etc.)
-        successful_outcomes = ['ball', 'single', 'double', 'triple', 'home_run', 'hit_into_play']
-        df_successful = df[df['events'].isin(successful_outcomes)]
+    # Sort by date and group by batter
+    df_sorted = df.sort_values("game_date", ascending=False)
+    grouped = df_sorted.groupby("batter_name")
 
-        # Filter to include only the last 5 games for each player (if you have the game date and batter name)
-        df['rank'] = df.groupby('batter_name')['game_date'].rank(method="first", ascending=False)
-        df_recent = df[df['rank'] <= 5]
+    hot_hitters = []
 
-        # Count successful outcomes per batter
-        summary = df_recent.groupby("batter_name").agg(
-            total_pas=("pitch_type", "count"),
-            successes=("events", lambda x: (x.isin(successful_outcomes)).sum())
-        ).reset_index()
+    for batter, group in grouped:
+        last_5 = group.head(5)
+        pa_count = len(last_5)
 
-        # Filter players who have at least 2 successful outcomes
-        hot_hitters = summary[summary["successes"] >= 2]
+        # Define success conditions
+        if include_ball:
+            success_mask = (
+                last_5["description"].isin(["ball", "hit_into_play"]) |
+                last_5["events"].isin(["single", "double", "triple", "home_run"])
+            )
+        else:
+            success_mask = (
+                last_5["description"].isin(["hit_into_play"]) |
+                last_5["events"].isin(["single", "double", "triple", "home_run"])
+            )
 
-        # Return hot hitters
-        return hot_hitters
-    else:
-        st.error("First-pitch data not found. Please ensure the dataset is available.")
-        return None
+        successes = success_mask.sum()
+
+        if pa_count >= 5 and successes >= 2:
+            hot_hitters.append({
+                "Batter": batter,
+                "First Pitch PAs": pa_count,
+                "In-Play/Hit Outcome": successes,
+            })
+
+    return pd.DataFrame(hot_hitters).sort_values(by="In-Play/Hit Outcome", ascending=False)
