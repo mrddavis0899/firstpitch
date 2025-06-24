@@ -61,7 +61,7 @@ def get_live_games():
 
 games = get_live_games()
 live_games = [g for g in games if g.get("status", {}).get("detailedState") == "In Progress"]
-debug_lines = [f"📊 Found {len(games)} games today, {len(live_games)} currently In Progress."]
+debug_blocks = []
 alerts = []
 leadoff_memory = {}  # Track preserved leadoff hitters after 2 outs
 
@@ -95,8 +95,9 @@ for game in live_games:
 
     current_index = valid_batters.index(batter_id) if batter_id in valid_batters else -1
     current_name = players.get(f"ID{batter_id}", {}).get("person", {}).get("fullName", "❓ Unknown")
-    debug_lines.append(f"🧠 {team_name} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}")
-    debug_lines.append(f"   Current Batter: {current_name} (Index {current_index})")
+
+    block_lines = [f"<strong>🧠 {team_name} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}</strong>",
+                   f"Current Batter: {current_name} (Index {current_index})"]
 
     # Always determine next batter
     next_index = (valid_batters.index(batter_id) + 1) % len(valid_batters)
@@ -109,11 +110,11 @@ for game in live_games:
     }
 
     if outs < 3:
-        debug_lines.append(f"   ⏭️ Projected Leadoff Next Inning: {next_name}")
+        block_lines.append(f"⏭️ Projected Leadoff Next Inning: {next_name}")
     else:
         leadoff_info = leadoff_memory.get(game_id)
         leadoff_name = leadoff_info["name"] if leadoff_info else next_name
-        debug_lines.append(f"   ⏭️ Leadoff Next Inning (locked): {leadoff_name}")
+        block_lines.append(f"<span style='color:red; font-weight:bold;'>⏭️ Leadoff Next Inning (locked): {leadoff_name}</span>")
 
         if normalize(leadoff_name) in normalized_targets:
             alert_key = (game_id, inning + 1, leadoff_name)
@@ -130,6 +131,8 @@ for game in live_games:
                 st.session_state.pinned_alerts.append(alert)
                 with open(ALERTS_FILE, "w") as f:
                     json.dump(st.session_state.pinned_alerts, f, indent=2)
+
+    debug_blocks.append(block_lines)
 
 # Show new alerts
 if alerts:
@@ -149,22 +152,14 @@ if st.session_state.pinned_alerts:
     with st.expander("📌 Pinned Alerts"):
         st.dataframe(pd.DataFrame(st.session_state.pinned_alerts))
 
-# Show debug info with visual separation per game
+# Show debug info with outlined blocks (vertical layout)
 with st.expander("🔍 Live Game Status"):
-    current_game = []
-    for line in debug_lines:
-        if line.startswith("\U0001f9e0"):
-            if current_game:
-                st.markdown("---")
-                for l in current_game:
-                    st.write(l)
-            current_game = [f"**{line}**"]
-        else:
-            current_game.append(line)
-    if current_game:
-        st.markdown("---")
-        for l in current_game:
-            st.write(l)
+    for block in debug_blocks:
+        html = "<div style='border:2px solid #ccc; padding:10px; border-radius:10px; margin-bottom:10px;'>"
+        for line in block:
+            html += f"<div style='margin-bottom:4px'>{line}</div>"
+        html += "</div>"
+        st.markdown(html, unsafe_allow_html=True)
 
 # Refresh
 time.sleep(refresh_rate)
