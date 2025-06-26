@@ -6,10 +6,25 @@ import pytz
 import time
 import os
 import json
+import gspread
+from google.oauth2 import service_account
 from unidecode import unidecode
 
 st.set_page_config(page_title="Live Tracker", layout="wide")
 st.title("🔴 Live First Pitch Leadoff Tracker")
+
+# ---------- GOOGLE SHEETS CONFIG ----------
+OUTCOME_SHEET_NAME = "firstpitch_outcome_log"
+
+@st.cache_resource
+def connect_to_outcome_sheet():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = service_account.Credentials.from_service_account_info(st.secrets["google"], scopes=scope)
+    client = gspread.authorize(creds)
+    sheet = client.open(OUTCOME_SHEET_NAME).sheet1
+    return sheet
+
+outcome_sheet = connect_to_outcome_sheet()
 
 def normalize(name):
     return unidecode(name).lower().strip()
@@ -22,6 +37,7 @@ if "alerts_fired" not in st.session_state:
 
 ALERTS_FILE = "data/pinned_alerts.json"
 os.makedirs("data", exist_ok=True)
+
 if os.path.exists(ALERTS_FILE):
     with open(ALERTS_FILE, "r") as f:
         st.session_state.pinned_alerts = json.load(f)
@@ -144,12 +160,17 @@ for game in live_games:
                 alert_key = (game_id, inning + 1, locked_name)
                 if alert_key not in st.session_state.alerts_fired:
                     st.session_state.alerts_fired.add(alert_key)
-                    detected_time = datetime.now(eastern).strftime('%I:%M %p').lstrip('0')
+                    now = datetime.now(eastern)
+                    detected_time = now.strftime('%I:%M %p').lstrip('0')
+                    alert_date = now.strftime('%Y-%m-%d')
                     alert = {
                         "Batter": locked_name,
                         "Team": team_name,
                         "Will Lead Off Inning": inning + 1,
-                        "Detected At": detected_time
+                        "Detected At": detected_time,
+                        "Date": alert_date,
+                        "Game": f"{game['teams']['away']['team']['abbreviation']} @ {game['teams']['home']['team']['abbreviation']}",
+                        "Outcome": ""
                     }
                     alerts.append(alert)
                     st.session_state.pinned_alerts.append(alert)
@@ -174,8 +195,50 @@ else:
     st.info("No target hitters currently set to lead off next inning.")
 
 if st.session_state.pinned_alerts:
-    with st.expander("📌 Pinned Alerts"):
-        st.dataframe(pd.DataFrame(st.session_state.pinned_alerts))
+    with st.expander("📌 Pinned Alerts with Outcome Logging"):
+        outcome_options = ["", "In-play Hit", "In-play Out", "Ball", "Foul", "Strike Looking", "Swinging Strike"]
+
+        for i, alert in enumerate(st.session_state.pinned_alerts):
+            cols = st.columns([3, 2])
+            with cols[0]:
+                game_info = alert.get("Game", "Unknown Game")
+                alert_date = alert.get("Date", "")
+                st.markdown(f"🔔 **{alert['Batter']}** – {game_info} – Inning {alert['Will Lead Off Inning']} – ⏰ {alert['Detected At']} – 📅 {alert_date}")
+            with cols[1]:
+                outcome = st.selectbox(
+                    f"Log Outcome ({i})",
+                    outcome_options,
+                    index=outcome_options.index(alert.get("Outcome", "")),
+                    key=f"outcome_select_{i}"
+                )
+                st.session_state.pinned_alerts[i]["Outcome"] = outcome
+
+        if st.button("📤 Log Outcomes to Google Sheet"):
+            still_pinned = []
+            for alert in st.session_state.pinned_alerts:
+                outcome = alert.get("Outcome", "")
+                if outcome and not alert.get("Logged"):
+                    new_row = [
+                        alert.get("Detected At", ""),
+                        alert.get("Date", ""),
+                        alert.get("Game", ""),
+                        alert.get("Team", ""),
+                        alert.get("Batter", ""),
+                        alert.get("Will Lead Off Inning", ""),
+                        outcome
+                    ]
+                    try:
+                        outcome_sheet.append_row(new_row)
+                        alert["Logged"] = True
+                    except Exception as e:
+                        st.error(f"❌ Failed to log: {alert['Batter']} – {e}")
+                        still_pinned.append(alert)
+                elif not outcome:
+                    still_pinned.append(alert)
+            st.session_state.pinned_alerts = still_pinned
+            with open(ALERTS_FILE, "w") as f:
+                json.dump(st.session_state.pinned_alerts, f, indent=2)
+            st.success("✅ Outcomes logged and completed alerts removed.")
 
 with st.expander("🔍 Live Game Status"):
     for block in debug_blocks:

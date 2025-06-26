@@ -1,96 +1,86 @@
 import streamlit as st
-import statsapi
+import requests
+import json
 from datetime import datetime
 import pytz
-import json
-import os
+from unidecode import unidecode
 
-st.title("🗓️ Upcoming Games")
+st.set_page_config(page_title="Upcoming Games", layout="wide")
+st.title("📂 Upcoming Games")
 
-# Refresh button
-if st.sidebar.button("🔄 Refresh Lineups"):
-    st.rerun()
+@st.cache_data(ttl=3600)
+def load_games():
+    url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=" + datetime.now(pytz.timezone("US/Eastern")).strftime("%Y-%m-%d")
+    res = requests.get(url).json()
+    return res["dates"][0]["games"] if res["dates"] else []
 
-# Display last check time
-now_est = datetime.now(pytz.timezone("US/Eastern")).strftime("%Y-%m-%d %I:%M:%S %p EST")
-st.markdown(f"⏰ **Lineups last checked:** {now_est}")
+@st.cache_data(ttl=3600)
+def load_lineups():
+    url = "https://statsapi.mlb.com/api/v1/game/linescore?sportId=1"
+    return requests.get(url).json()
 
-def convert_to_est(dt_str):
+@st.cache_data(ttl=3600)
+def get_last_5_lineups(team_id):
+    url = f"https://statsapi.mlb.com/api/v1/teams/{team_id}/roster"
+    return requests.get(url).json()
+
+def normalize(name):
+    return unidecode(name or "").lower().strip()
+
+# Load target hitters
+try:
+    with open("data/target_hitters.json") as f:
+        target_hitters = json.load(f)
+except FileNotFoundError:
+    target_hitters = []
+
+normalized_targets = {normalize(name) for name in target_hitters}
+
+# Fallback logic to extract projected leadoff from past 5 lineups (mocked version for now)
+def get_fallback_leadoff(team_id):
+    # Ideally you'd parse recent lineups and return most common 1st batter
+    # For now this just returns None to simulate logic stub
+    return None
+
+games = load_games()
+
+st.markdown(f"⏰ Lineups last checked: {datetime.now(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d %I:%M:%S %p ET')}")
+
+for game in games:
+    status = game["status"]["detailedState"]
+    if status not in ["Pre-Game", "Scheduled"]:
+        continue
+
+    away = game["teams"]["away"]["team"]["name"]
+    home = game["teams"]["home"]["team"]["name"]
+    away_id = game["teams"]["away"]["team"]["id"]
+    home_id = game["teams"]["home"]["team"]["id"]
+
     try:
-        dt = datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
-        dt = dt.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("US/Eastern"))
-        return dt.strftime("%-I:%M %p EST")
+        away_pitcher = game["teams"]["away"]["probablePitcher"]["fullName"]
     except:
-        return "TBD"
+        away_pitcher = "TBD"
+    try:
+        home_pitcher = game["teams"]["home"]["probablePitcher"]["fullName"]
+    except:
+        home_pitcher = "TBD"
 
-# Ensure /data folder exists
-os.makedirs("data", exist_ok=True)
-projected_pitchers_today = set()
-today = datetime.now().strftime("%Y-%m-%d")
-games = statsapi.schedule(date=today)
+    # Use fallback method to determine projected leadoff
+    away_leadoff = get_fallback_leadoff(away_id) or "TBD"
+    home_leadoff = get_fallback_leadoff(home_id) or "TBD"
 
-if not games:
-    st.warning("No MLB games today.")
-else:
-    target_hitters = st.session_state.get("target_hitters", set())
-    norm_targets = {n.lower() for n in target_hitters}
+    def highlight(name):
+        if normalize(name) in normalized_targets:
+            return f"<span style='color:red; font-weight:bold;'>🎯 {name}</span>"
+        return name
 
-    for game in games:
-        try:
-            away = game.get("away_name", "")
-            home = game.get("home_name", "")
-            ap = game.get("away_probable_pitcher", "")
-            hp = game.get("home_probable_pitcher", "")
-            ap = ap.get("fullName", ap) if isinstance(ap, dict) else ap
-            hp = hp.get("fullName", hp) if isinstance(hp, dict) else hp
-            stime = convert_to_est(game.get("game_datetime", ""))
+    game_time = datetime.strptime(game["gameDate"], "%Y-%m-%dT%H:%M:%SZ")
+    game_time_et = game_time.astimezone(pytz.timezone("US/Eastern")).strftime("%I:%M %p ET")
 
-            # Track pitchers
-            if ap and ap != "TBD":
-                projected_pitchers_today.add(ap)
-            if hp and hp != "TBD":
-                projected_pitchers_today.add(hp)
-
-            # Load game data
-            gid = game["game_id"]
-            gd = statsapi.get("game", {"gamePk": gid})
-            away_players = gd.get("away", {}).get("players", {})
-            home_players = gd.get("home", {}).get("players", {})
-            ao = gd.get("away", {}).get("battingOrder", [])
-            ho = gd.get("home", {}).get("battingOrder", [])
-
-            def extract_leadoff(order, players, is_home):
-                if order:
-                    return players.get(f"ID{order[0]}", {}).get("person", {}).get("fullName", "TBD")
-                else:
-                    # Try to find jersey numbers 1–9 (batting order placeholders)
-                    for p in players.values():
-                        if p.get("battingOrder", 9999) == 1:
-                            name = p.get("person", {}).get("fullName", "TBD")
-                            return f"⚠️ {name}"
-                return "TBD"
-
-            top1 = extract_leadoff(ao, away_players, False)
-            bot1 = extract_leadoff(ho, home_players, True)
-
-            def format_name(name):
-                clean = name.replace("⚠️", "").strip()
-                label = f"🎯 {name}" if clean.lower() in norm_targets else name
-                if "⚠️" in name:
-                    return f'<span style="color: goldenrod;">{label}</span>'
-                return label
-
-            label = f"{away} @ {home} – {stime}"
-            with st.expander(label):
-                st.markdown(f"**Top1:** {format_name(top1)} vs. {hp}", unsafe_allow_html=True)
-                st.markdown(f"**Bot1:** {format_name(bot1)} vs. {ap}", unsafe_allow_html=True)
-
-                if "TBD" in top1 or "TBD" in bot1:
-                    st.info("🕒 Lineups not yet posted. Projections shown in yellow if available.")
-
-        except Exception as e:
-            st.error(f"Error processing {away} @ {home}: {e}")
-
-    # Save pitcher list
-    with open("data/projected_pitchers_today.json", "w") as f:
-        json.dump(sorted(projected_pitchers_today), f, indent=2)
+    st.markdown(f"""
+    <div style='padding: 12px 20px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px;'>
+        <h4 style='margin-bottom: 8px;'>{away} @ {home} <span style='font-weight:normal;'>🕒 {game_time_et}</span></h4>
+        <p style='margin:4px 0;'><strong>Top1:</strong> {highlight(away_leadoff)} vs. {home_pitcher}</p>
+        <p style='margin:4px 0;'><strong>Bot1:</strong> {highlight(home_leadoff)} vs. {away_pitcher}</p>
+    </div>
+    """, unsafe_allow_html=True)

@@ -38,11 +38,29 @@ if st.sidebar.button("🔄 Refresh Pitcher Data"):
         **{
             "First Pitch Total": ("pitch_type", "count"),
             "First Pitch In-Play #": ("description", lambda x: (x == "hit_into_play").sum()),
+            "First Pitch Ball #": ("description", lambda x: (x == "ball").sum()),
+            "First Pitch Called Strike #": ("description", lambda x: (x == "called_strike").sum()),
+            "First Pitch Swinging Strike #": ("description", lambda x: (x == "swinging_strike").sum()),
+            "First Pitch Foul #": ("description", lambda x: (x == "foul").sum()),
+            "First Pitch Hit #": ("events", lambda x: x.isin(["single", "double", "triple", "home_run"]).sum()),
+            "First Pitch xBA": ("estimated_ba_using_speedangle", lambda x: x.mean(skipna=True)),
         }
     )
+
     pitcher_grouped["First Pitch In-Play %"] = (
         pitcher_grouped["First Pitch In-Play #"] / pitcher_grouped["First Pitch Total"]
     ).round(3)
+    pitcher_grouped["First Pitch Ball %"] = (
+        pitcher_grouped["First Pitch Ball #"] / pitcher_grouped["First Pitch Total"]
+    ).round(3)
+    pitcher_grouped["First Pitch Strike %"] = (
+        (
+            pitcher_grouped["First Pitch Called Strike #"] +
+            pitcher_grouped["First Pitch Swinging Strike #"] +
+            pitcher_grouped["First Pitch Foul #"]
+        ) / pitcher_grouped["First Pitch Total"]
+    ).round(3)
+    pitcher_grouped["First Pitch xBA"] = pitcher_grouped["First Pitch xBA"].round(3)
 
     pitcher_grouped = pitcher_grouped.reset_index().rename(columns={"pitcher": "player_id"})
     name_map = playerid_reverse_lookup(pitcher_grouped["player_id"].tolist())
@@ -150,7 +168,14 @@ if show_pitchers:
 
         st.dataframe(
             pitcher_filtered.sort_values("First Pitch In-Play %", ascending=False)[[
-                "pitcher_name", "First Pitch Total", "First Pitch In-Play #", "First Pitch In-Play %"
+                "pitcher_name",
+                "First Pitch Total",
+                "First Pitch In-Play #",
+                "First Pitch In-Play %",
+                "First Pitch Strike %",
+                "First Pitch Ball %",
+                "First Pitch Hit #",
+                "First Pitch xBA"
             ]],
             use_container_width=True,
             hide_index=True
