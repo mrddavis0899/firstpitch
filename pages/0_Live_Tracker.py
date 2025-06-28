@@ -27,10 +27,67 @@ def connect_to_outcome_sheet():
 outcome_sheet = connect_to_outcome_sheet()
 
 def normalize(name):
+    return unidecode(name).strip().lower().replace("\xa0", " ")
     return unidecode(name).lower().strip()
+
+
+# ---------- HOT HITTER HIGHLIGHTING ----------
+def normalize(name):
+    return unidecode(name).lower().strip().replace("\xa0", " ")
+
+try:
+    df_with = pd.read_csv("data/hot_hitters_with_ball.csv")
+    hot_with_ball = set(df_with["Batter"].astype(str).map(normalize).dropna())
+except Exception as e:
+    st.sidebar.write("⚠️ Error loading hot_with_ball:", e)
+    hot_with_ball = set()
+
+try:
+    df_no = pd.read_csv("data/hot_hitters_no_ball.csv")
+    hot_no_ball = set(df_no["Batter"].astype(str).map(normalize).dropna())
+except Exception as e:
+    st.sidebar.write("⚠️ Error loading hot_no_ball:", e)
+    hot_no_ball = set()
+
+
+def format_hot_name(name):
+    norm = normalize(name)
+    if norm in hot_with_ball:
+        return f"{name} 🔥🟢"
+    elif norm in hot_no_ball:
+        return f"{name} 🔥🟡"
+    return name
 
 target_hitters = st.session_state.get("target_hitters", set())
 normalized_targets = {normalize(name) for name in target_hitters}
+
+# ---------- HOT HITTER DEBUGGING ----------
+hot_with_ball = set()
+hot_no_ball = set()
+
+try:
+    df_with = pd.read_csv("data/hot_hitters_with_ball.csv")
+    df_with["Batter"] = df_with["Batter"].astype(str).apply(normalize)
+    hot_with_ball = set(df_with["Batter"])
+except Exception as e:
+    st.sidebar.write("⚠️ Error loading with-ball CSV:", e)
+
+try:
+    df_no = pd.read_csv("data/hot_hitters_no_ball.csv")
+    df_no["Batter"] = df_no["Batter"].astype(str).apply(normalize)
+    hot_no_ball = set(df_no["Batter"])
+except Exception as e:
+    st.sidebar.write("⚠️ Error loading no-ball CSV:", e)
+
+
+def format_hot_name(name):
+    norm = normalize(name)
+
+    if norm in hot_with_ball:
+        return f"{name} 🔥🟢"
+    elif norm in hot_no_ball:
+        return f"{name} 🔥🟡"
+    return name
 
 if "alerts_fired" not in st.session_state:
     st.session_state.alerts_fired = set()
@@ -116,7 +173,7 @@ for game in live_games:
         current_name = players.get(f"ID{batter_id}", {}).get("person", {}).get("fullName", "❓ Unknown")
 
         block_lines = [f"<strong>🧠 {team_name} - Inning {inning} ({'Top' if is_top else 'Bottom'}), Outs: {outs}</strong>",
-                       f"Current Batter: {current_name} (Index {current_index})"]
+                       f"Current Batter: {format_hot_name(current_name)} (Index {current_index})"]
 
         if outs < 3:
             projected_index = (current_index + (3 - outs)) % len(valid_batters)
@@ -125,10 +182,10 @@ for game in live_games:
 
             leadoff_memory[game_id] = {
                 "id": next_id,
-                "name": next_name
+                "name": format_hot_name(next_name)
             }
-            target_marker = " 🎯" if normalize(next_name) in normalized_targets else ""
-            block_lines.append(f"⏭️ Projected Leadoff Next Inning: {next_name}{target_marker}")
+            target_marker = " 🎯" if normalize(format_hot_name(next_name)) in normalized_targets else ""
+            block_lines.append(f"⏭️ Projected Leadoff Next Inning: {format_hot_name(next_name)}{target_marker}")
 
         else:
             all_plays = feed.get("liveData", {}).get("plays", {}).get("allPlays", [])
@@ -150,21 +207,21 @@ for game in live_games:
 
             leadoff_memory[game_id] = {
                 "id": locked_id,
-                "name": locked_name
+                "name": format_hot_name(locked_name)
             }
 
-            target_marker = " 🎯" if normalize(locked_name) in normalized_targets else ""
-            block_lines.append(f"<span style='color:red; font-weight:bold;'>⏭️ Leadoff Next Inning (locked): {locked_name}{target_marker}</span>")
+            target_marker = " 🎯" if normalize(format_hot_name(locked_name)) in normalized_targets else ""
+            block_lines.append(f"<span style='color:red; font-weight:bold;'>⏭️ Leadoff Next Inning (locked): {format_hot_name(locked_name)}{target_marker}</span>")
 
-            if normalize(locked_name) in normalized_targets:
-                alert_key = (game_id, inning + 1, locked_name)
+            if normalize(format_hot_name(locked_name)) in normalized_targets:
+                alert_key = (game_id, inning + 1, format_hot_name(locked_name))
                 if alert_key not in st.session_state.alerts_fired:
                     st.session_state.alerts_fired.add(alert_key)
                     now = datetime.now(eastern)
                     detected_time = now.strftime('%I:%M %p').lstrip('0')
                     alert_date = now.strftime('%Y-%m-%d')
                     alert = {
-                        "Batter": locked_name,
+                        "Batter": format_hot_name(locked_name),
                         "Team": team_name,
                         "Will Lead Off Inning": inning + 1,
                         "Detected At": detected_time,
@@ -185,7 +242,7 @@ for game in live_games:
 if alerts:
     st.subheader("🚨 Leadoff Alert: Target Hitter Leading Off Next Inning")
     for alert in alerts:
-        msg = f"**🧨 {alert['Batter']}** from the **{alert['Team']}** will lead off the **{alert['Will Lead Off Inning']}** inning. ⏰ Detected at **{alert['Detected At']}**."
+        msg = f"**🧨 {format_hot_name(alert['Batter'])}** from the **{alert['Team']}** will lead off the **{alert['Will Lead Off Inning']}** inning. ⏰ Detected at **{alert['Detected At']}**."
         st.markdown(f"""
         <div style='background-color:#ff6347; color:white; padding:15px; border-radius:10px; font-weight:bold;'>
             {msg}
@@ -203,7 +260,7 @@ if st.session_state.pinned_alerts:
             with cols[0]:
                 game_info = alert.get("Game", "Unknown Game")
                 alert_date = alert.get("Date", "")
-                st.markdown(f"🔔 **{alert['Batter']}** – {game_info} – Inning {alert['Will Lead Off Inning']} – ⏰ {alert['Detected At']} – 📅 {alert_date}")
+                st.markdown(f"🔔 **{format_hot_name(alert['Batter'])}** – {game_info} – Inning {alert['Will Lead Off Inning']} – ⏰ {alert['Detected At']} – 📅 {alert_date}")
             with cols[1]:
                 outcome = st.selectbox(
                     f"Log Outcome ({i})",
@@ -231,7 +288,7 @@ if st.session_state.pinned_alerts:
                         outcome_sheet.append_row(new_row)
                         alert["Logged"] = True
                     except Exception as e:
-                        st.error(f"❌ Failed to log: {alert['Batter']} – {e}")
+                        st.error(f"❌ Failed to log: {format_hot_name(alert['Batter'])} – {e}")
                         still_pinned.append(alert)
                 elif not outcome:
                     still_pinned.append(alert)

@@ -5,27 +5,36 @@ import json
 from datetime import date
 from pybaseball import statcast, playerid_reverse_lookup
 
-CSV_FILE = "first_pitch_data_2025.csv"
+CSV_FILE = "first_pitch_hitters_2025.csv"
 CLEANED_PITCHER_FILE = "first_pitch_data_2025_cleaned.csv"
 
 @st.cache_data
 def load_first_pitch_data():
-    if os.path.exists(CSV_FILE):
-        return pd.read_csv(CSV_FILE)
+    from pybaseball import statcast, playerid_reverse_lookup
+    from datetime import date
 
     start = "2025-03-20"
     end = date.today().strftime("%Y-%m-%d")
+
+    st.info("Fetching first pitch data...")
+
+    # Pull Statcast data
     df = statcast(start, end)
     df = df[df["pitch_number"] == 1].copy()
 
-    batter_ids = df["batter"].dropna().unique()
-    id_map = playerid_reverse_lookup(batter_ids)
-    id_map = id_map[["key_mlbam", "name_first", "name_last"]]
-    id_map["batter_name"] = id_map["name_first"] + " " + id_map["name_last"]
-    df = df.merge(id_map[["key_mlbam", "batter_name"]], left_on="batter", right_on="key_mlbam", how="left")
+    # Save full unfiltered first pitch data
+    df.to_csv("first_pitch_data_2025.csv", index=False)
 
-    df.to_csv(CSV_FILE, index=False)
-    return df
+    # Remove likely pitchers from batter dataset
+    batter_df = df[~df["player_name"].str.contains(" P$", na=False)]
+
+    # Save hitters-only file
+    batter_df.to_csv("first_pitch_hitters_2025.csv", index=False)
+
+    return batter_df
+
+    st.warning("⚠️ Data not found. Please click 'Refresh Batters Data' to generate stats.")
+    return pd.DataFrame()
 
 st.title("📊 Trend Explorer – First Pitch Performance")
 
@@ -76,11 +85,41 @@ if st.sidebar.button("🔄 Refresh Batter Data"):
         os.remove(CSV_FILE)
     st.cache_data.clear()
     st.rerun()
+if st.sidebar.button("🧼 One-Click Full Refresh and Regenerate"):
+    files = [
+        "first_pitch_data_2025.csv",
+        "first_pitch_hitters_2025.csv"
+    ]
+    for file in files:
+        if os.path.exists(file):
+            os.remove(file)
+
+    st.cache_data.clear()
+    st.info("Generating fresh first pitch data... please wait.")
+
+    # Regenerate CSV
+    df = load_first_pitch_data()
+
+    if df.empty:
+        st.error("❌ Failed to generate fresh data.")
+    else:
+        st.success("✅ First pitch data successfully refreshed and reloaded.")
+        st.rerun()
 
 with st.spinner("Loading 2025 first pitch data..."):
     df = load_first_pitch_data()
 
+if df.empty:
+    st.stop()
+
 st.subheader("Search and Filter First Pitch Hitters")
+
+df["batter"] = pd.to_numeric(df["batter"], errors="coerce")
+
+lookup_df = pd.read_csv("player_name_lookup.csv")
+id_to_name = dict(zip(lookup_df["key_mlbam"], lookup_df["full_name"]))
+
+df["batter_name"] = df["batter"].map(id_to_name).str.lower()
 
 grouped = df.groupby("batter_name").agg(
     total_fp=("pitch_type", "count"),

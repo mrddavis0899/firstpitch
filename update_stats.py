@@ -1,3 +1,4 @@
+
 import pandas as pd
 from pybaseball import statcast
 from datetime import datetime
@@ -67,6 +68,10 @@ def fetch_and_process_statcast(start, end):
         "Doubles": "2B",
         "HR": "HR"
     }, inplace=True)
+
+    # Save raw first pitch data for Hot Hitters
+    df_fp.to_csv("first_pitch_data_2025.csv", index=False)
+    print("✅ Saved full first-pitch PAs to first_pitch_data_2025.csv")
 
     return summary
 
