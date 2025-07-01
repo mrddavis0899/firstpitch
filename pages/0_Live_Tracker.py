@@ -184,7 +184,7 @@ for game in live_games:
                 "id": next_id,
                 "name": format_hot_name(next_name)
             }
-            target_marker = " 🎯" if normalize(format_hot_name(next_name)) in normalized_targets else ""
+            target_marker = " 🎯" if normalize(next_name) in normalized_targets else ""
             block_lines.append(f"⏭️ Projected Leadoff Next Inning: {format_hot_name(next_name)}{target_marker}")
 
         else:
@@ -213,7 +213,7 @@ for game in live_games:
             target_marker = " 🎯" if normalize(format_hot_name(locked_name)) in normalized_targets else ""
             block_lines.append(f"<span style='color:red; font-weight:bold;'>⏭️ Leadoff Next Inning (locked): {format_hot_name(locked_name)}{target_marker}</span>")
 
-            if normalize(format_hot_name(locked_name)) in normalized_targets:
+            if normalize(locked_name) in normalized_targets:
                 alert_key = (game_id, inning + 1, format_hot_name(locked_name))
                 if alert_key not in st.session_state.alerts_fired:
                     st.session_state.alerts_fired.add(alert_key)

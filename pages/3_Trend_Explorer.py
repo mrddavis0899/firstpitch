@@ -43,7 +43,7 @@ if st.sidebar.button("🔄 Refresh Pitcher Data"):
     pitcher_data = statcast("2025-03-27", date.today().strftime("%Y-%m-%d"))
     pitcher_data = pitcher_data[pitcher_data["pitch_number"] == 1]
 
-    pitcher_grouped = pitcher_data.groupby("pitcher").agg(
+    grouped = pitcher_data.groupby("pitcher").agg(
         **{
             "First Pitch Total": ("pitch_type", "count"),
             "First Pitch In-Play #": ("description", lambda x: (x == "hit_into_play").sum()),
@@ -56,25 +56,33 @@ if st.sidebar.button("🔄 Refresh Pitcher Data"):
         }
     )
 
-    pitcher_grouped["First Pitch In-Play %"] = (
-        pitcher_grouped["First Pitch In-Play #"] / pitcher_grouped["First Pitch Total"]
-    ).round(3)
-    pitcher_grouped["First Pitch Ball %"] = (
-        pitcher_grouped["First Pitch Ball #"] / pitcher_grouped["First Pitch Total"]
-    ).round(3)
-    pitcher_grouped["First Pitch Strike %"] = (
+    grouped["First Pitch In-Play %"] = (grouped["First Pitch In-Play #"] / grouped["First Pitch Total"]).round(3)
+    grouped["First Pitch Ball %"] = (grouped["First Pitch Ball #"] / grouped["First Pitch Total"]).round(3)
+    grouped["First Pitch Strike %"] = (
         (
-            pitcher_grouped["First Pitch Called Strike #"] +
-            pitcher_grouped["First Pitch Swinging Strike #"] +
-            pitcher_grouped["First Pitch Foul #"]
-        ) / pitcher_grouped["First Pitch Total"]
+            grouped["First Pitch Called Strike #"] +
+            grouped["First Pitch Swinging Strike #"] +
+            grouped["First Pitch Foul #"]
+        ) / grouped["First Pitch Total"]
     ).round(3)
-    pitcher_grouped["First Pitch xBA"] = pitcher_grouped["First Pitch xBA"].round(3)
+    grouped["First Pitch xBA"] = grouped["First Pitch xBA"].round(3)
 
-    pitcher_grouped = pitcher_grouped.reset_index().rename(columns={"pitcher": "player_id"})
-    name_map = playerid_reverse_lookup(pitcher_grouped["player_id"].tolist())
+    grouped = grouped.reset_index().rename(columns={"pitcher": "player_id"})
+
+    name_map = playerid_reverse_lookup(grouped["player_id"].tolist())
     name_map["player_name"] = name_map["name_first"] + " " + name_map["name_last"]
-    merged = pitcher_grouped.merge(name_map[["key_mlbam", "player_name"]], left_on="player_id", right_on="key_mlbam", how="left")
+
+    merged = grouped.merge(
+        name_map[["key_mlbam", "player_name"]],
+        left_on="player_id",
+        right_on="key_mlbam",
+        how="left"
+    )
+
+    # ✅ Add pitcher team name safely
+    pitcher_to_team = pitcher_data.groupby("pitcher")["home_team"].first().to_dict()
+    merged["Team"] = merged["player_id"].map(pitcher_to_team)
+
     merged.to_csv(CLEANED_PITCHER_FILE, index=False)
 
     st.success("Pitcher data refreshed!")
@@ -208,6 +216,7 @@ if show_pitchers:
         st.dataframe(
             pitcher_filtered.sort_values("First Pitch In-Play %", ascending=False)[[
                 "pitcher_name",
+                "Team",
                 "First Pitch Total",
                 "First Pitch In-Play #",
                 "First Pitch In-Play %",
