@@ -17,7 +17,9 @@ def get_hot_hitters(include_ball=False):
     df["success_no_ball"] = df["description"].isin(success_descriptions) | df["events"].isin(success_events)
     df["success_with_ball"] = df["success_no_ball"] | (df["description"] == "ball")
 
-    df = df.sort_values("game_date", ascending=False)
+    # ✅ Use full sort to get most recent ABs (safely fallback if columns missing)
+    sort_cols = [col for col in ["game_date", "game_pk", "at_bat_number"] if col in df.columns]
+    df = df.sort_values(sort_cols, ascending=[False] * len(sort_cols))
     grouped = df.groupby("batter").head(10)
 
     print("Unique batters before filter:", grouped['batter'].nunique())

@@ -21,7 +21,10 @@ if st.button("Refresh Hot Hitters"):
 if "hot_hitters" in st.session_state:
     hot_hitters = st.session_state.hot_hitters
 
-    st.subheader("Top 5 Hot Hitters (Last 10 First Pitch PAs with 5+ Successes)")
+    # ✅ Filter: Only show players who had at least 1 first pitch PA
+    hot_hitters = hot_hitters[hot_hitters["First Pitch PAs"] > 0]
+
+    st.subheader("Top 5 Hot Hitters")
     if not hot_hitters.empty:
         st.dataframe(
             hot_hitters.head(5)[["Batter", "First Pitch PAs", "Successes"]],
