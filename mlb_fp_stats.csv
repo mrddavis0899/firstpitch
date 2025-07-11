@@ -16,7 +16,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Armstrong, Shawn",17,16,16,1,0.295,R,1,0,1,LAA,94.1,94.1,5.9
 "Ashby, Aaron",10,9,9,0,0.253,R,3,0,0,LAD,90.0,90.0,0.0
 "Ashcraft, Braxton",13,12,12,1,0.326,R,2,1,0,SEA,92.3,92.3,7.7
-"Ashcraft, Graham",20,20,20,1,0.262,R,4,1,0,DET,100.0,100.0,5.0
+"Ashcraft, Graham",21,21,21,1,0.286,R,5,1,0,MIA,100.0,100.0,4.8
 "Bachar, Lake",19,19,19,4,0.296,L,0,4,0,CIN,100.0,100.0,21.1
 "Bachman, Sam",10,10,10,2,0.432,R,2,2,0,TEX,100.0,100.0,20.0
 "Baker, Bryan",20,20,20,3,0.373,R,6,1,2,ATL,100.0,100.0,15.0
@@ -46,14 +46,15 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Bowlan, Jonathan",10,10,10,1,0.287,R,1,1,0,ATH,100.0,100.0,10.0
 "Bowman, Matt",10,10,10,1,0.503,L,3,0,1,TEX,100.0,100.0,10.0
 "Boyd, Matthew",54,56,56,8,0.358,R,14,4,4,STL,103.7,103.7,14.8
-"Bradley, Taj",55,59,59,3,0.343,R,20,2,1,MIN,107.3,107.3,5.5
+"Bradley, Taj",56,60,60,3,0.34,L,20,2,1,BOS,107.1,107.1,5.4
 "Brazobán, Huascar",20,19,19,0,0.26,R,2,0,0,NYY,95.0,95.0,0.0
 "Brebbia, John",10,10,10,3,0.275,L,1,2,1,CIN,100.0,100.0,30.0
 "Brogdon, Connor",16,15,15,1,0.331,R,3,0,1,WSH,93.8,93.8,6.2
 "Brown, Ben",47,49,49,5,0.333,R,8,2,3,STL,104.3,104.3,10.6
 "Brown, Hunter",37,38,37,4,0.312,R,6,0,4,CLE,102.7,100.0,10.8
 "Bubic, Kris",54,53,53,4,0.341,R,11,3,1,PIT,98.1,98.1,7.4
-"Buehler, Walker",50,47,47,7,0.352,L,10,1,6,WSH,94.0,94.0,14.0
+"Buehler, Walker",54,51,51,8,0.343,L,10,1,7,TB,94.4,94.4,14.8
+"Bummer, Aaron",10,10,10,1,0.329,L,3,1,0,ATH,100.0,100.0,10.0
 "Burke, Brock",23,23,23,2,0.309,R,6,0,2,TEX,100.0,100.0,8.7
 "Burke, Sean",64,62,62,9,0.379,R,12,4,5,TOR,96.9,96.9,14.1
 "Burnes, Corbin",33,34,34,5,0.338,L,9,2,3,WSH,103.0,103.0,15.2
@@ -78,7 +79,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Clarke, Taylor",13,13,13,1,0.365,R,3,1,0,AZ,100.0,100.0,7.7
 "Clase, Emmanuel",25,25,25,2,0.251,L,7,2,0,CHC,100.0,100.0,8.0
 "Cleavinger, Garrett",18,16,16,2,0.54,R,6,0,2,MIN,88.9,88.9,11.1
-"Corbin, Patrick",49,48,48,6,0.36,R,10,3,3,SD,98.0,98.0,12.2
+"Corbin, Patrick",53,52,52,8,0.362,R,10,4,4,LAA,98.1,98.1,15.1
 "Coulombe, Danny",14,14,14,0,0.251,L,4,0,0,TB,100.0,100.0,0.0
 "Criswell, Cooper",10,12,12,1,0.246,R,3,1,0,CIN,120.0,120.0,10.0
 "Crochet, Garrett",56,57,57,6,0.283,R,12,3,3,WSH,101.8,101.8,10.7
@@ -97,7 +98,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Eflin, Zach",39,39,39,9,0.41,L,9,4,5,TB,100.0,100.0,23.1
 "Eisert, Brandon",23,20,20,4,0.222,R,3,4,0,TOR,87.0,87.0,17.4
 "Elder, Bryce",52,52,52,11,0.326,R,8,6,5,ATH,100.0,100.0,21.2
-"Englert, Mason",13,13,13,1,0.411,R,3,0,1,DET,100.0,100.0,7.7
+"Englert, Mason",14,14,14,1,0.386,R,3,0,1,BOS,100.0,100.0,7.1
 "Eovaldi, Nathan",38,39,39,2,0.328,L,5,1,1,LAA,102.6,102.6,5.3
 "Estes, Joey",14,14,14,3,0.357,L,2,1,2,COL,100.0,100.0,21.4
 "Estrada, Jeremiah",26,26,26,4,0.368,R,4,3,1,TEX,100.0,100.0,15.4
@@ -105,7 +106,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Evans, Logan",30,30,30,2,0.307,L,7,1,1,NYY,100.0,100.0,6.7
 "Fairbanks, Pete",13,15,15,1,0.219,R,3,1,0,DET,115.4,115.4,7.7
 "Falter, Bailey",50,50,50,2,0.308,R,12,0,2,KC,100.0,100.0,4.0
-"Faucher, Calvin",19,18,18,1,0.401,L,7,1,0,MIN,94.7,94.7,5.3
+"Faucher, Calvin",20,19,19,1,0.384,L,7,1,0,CIN,95.0,95.0,5.0
 "Fedde, Erick",66,66,66,6,0.29,L,11,3,3,CHC,100.0,100.0,9.1
 "Feltner, Ryan",16,16,16,5,0.38,R,3,2,3,ATL,100.0,100.0,31.2
 "Ferguson, Caleb",20,19,19,1,0.3,R,1,1,0,KC,95.0,95.0,5.0
@@ -113,7 +114,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Ferrer, Jose A.",33,31,31,3,0.358,R,5,2,1,DET,93.9,93.9,9.1
 "Festa, David",25,23,23,2,0.33,R,5,2,0,CHC,92.0,92.0,8.0
 "Festa, Matt",20,20,20,3,0.243,R,2,2,1,HOU,100.0,100.0,15.0
-"Finnegan, Kyle",19,17,17,0,0.263,R,4,0,0,BOS,89.5,89.5,0.0
+"Finnegan, Kyle",20,18,18,0,0.254,R,4,0,0,STL,90.0,90.0,0.0
 "Fitts, Richard",20,19,19,2,0.42,R,5,0,2,COL,95.0,95.0,10.0
 "Flaherty, Jack",43,43,43,5,0.38,L,11,3,2,TB,100.0,100.0,11.6
 "Flexen, Chris",19,18,18,0,0.245,R,3,0,0,STL,94.7,94.7,0.0
@@ -163,9 +164,9 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Hendricks, Kyle",48,51,51,4,0.311,L,13,3,1,TEX,106.2,106.2,8.3
 "Henriquez, Ronny",19,17,17,1,0.339,R,4,1,0,MIL,89.5,89.5,5.3
 "Henry, Cole",15,13,13,3,0.482,L,3,1,2,STL,86.7,86.7,20.0
-"Herget, Jimmy",24,24,24,5,0.423,R,6,4,1,BOS,100.0,100.0,20.8
+"Herget, Jimmy",24,24,24,5,0.433,R,6,4,1,BOS,100.0,100.0,20.8
 "Hernández, Carlos",22,22,22,3,0.431,R,4,2,1,CLE,100.0,100.0,13.6
-"Hernández, Daysbel",10,10,10,0,0.182,R,2,0,0,PHI,100.0,100.0,0.0
+"Hernández, Daysbel",11,11,11,0,0.219,R,2,0,0,ATH,100.0,100.0,0.0
 "Herrin, Tim",17,15,15,3,0.35,L,2,3,0,DET,88.2,88.2,17.6
 "Hicks, Jordan",33,31,31,2,0.302,R,9,1,1,CIN,93.9,93.9,6.1
 "Hill, Tim",33,33,33,3,0.31,R,3,1,2,NYM,100.0,100.0,9.1
@@ -180,7 +181,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Houck, Tanner",33,35,35,5,0.39,R,8,1,4,DET,106.1,106.1,15.2
 "Houser, Adrian",33,33,33,2,0.335,R,7,2,0,TOR,100.0,100.0,6.1
 "Hurter, Brant",24,22,22,2,0.348,R,6,2,0,WSH,91.7,91.7,8.3
-"Iglesias, Raisel",18,19,19,5,0.378,R,4,2,3,PHI,105.6,105.6,27.8
+"Iglesias, Raisel",19,20,20,5,0.358,R,4,2,3,ATH,105.3,105.3,26.3
 "Imanaga, Shota",26,26,26,7,0.44,R,4,4,3,MIN,100.0,100.0,26.9
 "Irvin, Jake",60,59,59,7,0.367,R,13,3,4,STL,98.3,98.3,11.7
 "Jackson, Luke",26,25,25,0,0.261,R,7,0,0,LAA,96.2,96.2,0.0
@@ -192,7 +193,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Junis, Jakob",25,23,23,2,0.384,R,7,2,0,HOU,92.0,92.0,8.0
 "Junk, Janson",23,23,23,2,0.349,R,4,2,0,CIN,100.0,100.0,8.7
 "Kahnle, Tommy",17,17,17,0,0.199,L,2,0,0,WSH,100.0,100.0,0.0
-"Keller, Brad",20,19,19,2,0.335,L,8,2,0,STL,95.0,95.0,10.0
+"Keller, Brad",21,20,20,2,0.348,L,8,2,0,MIN,95.2,95.2,9.5
 "Keller, Mitch",56,54,54,4,0.235,R,9,2,2,KC,96.4,96.4,7.1
 "Kelly, Kevin",11,11,11,2,0.379,R,3,1,1,MIN,100.0,100.0,18.2
 "Kelly, Merrill",54,57,57,8,0.382,L,9,6,2,SD,105.6,105.6,14.8
@@ -207,7 +208,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Kirby, George",20,19,19,2,0.256,L,2,1,1,PIT,95.0,95.0,10.0
 "Kittredge, Andrew",14,14,14,2,0.36,L,2,1,1,NYM,100.0,100.0,14.3
 "Knack, Landon",18,18,18,5,0.398,R,2,1,4,NYM,100.0,100.0,27.8
-"Kochanowicz, Jack",68,67,67,5,0.386,L,22,2,3,TOR,98.5,98.5,7.4
+"Kochanowicz, Jack",69,68,68,5,0.39,L,23,2,3,TEX,98.6,98.6,7.2
 "Koenig, Jared",17,17,17,4,0.397,R,3,3,1,STL,100.0,100.0,23.5
 "Kolek, Stephen",44,41,41,3,0.332,L,9,0,3,TEX,93.2,93.2,6.8
 "Kranick, Max",19,19,19,2,0.328,L,3,0,2,TB,100.0,100.0,10.5
@@ -226,7 +227,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Littell, Zack",73,73,73,12,0.302,R,10,6,6,DET,100.0,100.0,16.4
 "Little, Brendon",12,12,12,1,0.278,R,2,1,0,LAA,100.0,100.0,8.3
 "Lively, Ben",15,19,19,3,0.261,R,2,2,1,MIL,126.7,126.7,20.0
-"Lodolo, Nick",57,55,55,10,0.38,R,8,5,5,PHI,96.5,96.5,17.5
+"Lodolo, Nick",58,56,56,10,0.377,R,8,5,5,MIA,96.6,96.6,17.2
 "Long, Sam",12,11,11,1,0.36,L,4,1,0,AZ,91.7,91.7,8.3
 "Lopez, Jacob",18,17,17,1,0.328,R,6,0,1,TB,94.4,94.4,5.6
 "Lord, Brad",29,30,30,1,0.373,R,8,0,1,BOS,103.4,103.4,3.4
@@ -256,7 +257,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Megill, Tylor",30,28,28,2,0.284,L,7,2,0,TB,93.3,93.3,6.7
 "Mejia, Juan",11,11,11,2,0.453,R,2,2,0,HOU,100.0,100.0,18.2
 "Meyer, Max",41,40,40,3,0.337,R,13,1,2,COL,97.6,97.6,7.3
-"Mikolas, Miles",45,45,45,2,0.314,R,7,1,1,CHC,100.0,100.0,4.4
+"Mikolas, Miles",49,49,49,2,0.311,R,8,1,1,WSH,100.0,100.0,4.1
 "Miller, Bryce",25,25,25,2,0.367,R,7,2,0,LAA,100.0,100.0,8.0
 "Miller, Erik",17,18,18,2,0.285,R,4,2,0,AZ,105.9,105.9,11.8
 "Miller, Mason",18,17,17,6,0.383,L,2,2,4,HOU,94.4,94.4,33.3
@@ -266,14 +267,14 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Mlodzinski, Carmen",28,28,28,7,0.434,L,9,6,1,MIL,100.0,100.0,25.0
 "Montero, Keider",31,30,30,4,0.357,R,7,2,2,TB,96.8,96.8,12.9
 "Montgomery, Mason",16,16,16,1,0.337,R,5,1,0,MIN,100.0,100.0,6.2
-"Morejon, Adrian",20,20,20,2,0.323,R,5,1,1,TEX,100.0,100.0,10.0
+"Morejon, Adrian",22,22,22,2,0.298,R,5,1,1,AZ,100.0,100.0,9.1
 "Morgan, David",13,13,13,1,0.398,R,3,0,1,TEX,100.0,100.0,7.7
 "Morillo, Juan",21,21,21,1,0.259,R,7,1,0,SF,100.0,100.0,4.8
-"Morton, Charlie",41,40,39,6,0.337,R,8,2,4,ATL,97.6,95.1,14.6
+"Morton, Charlie",44,43,42,6,0.332,L,9,2,4,NYM,97.7,95.5,13.6
 "Myers, Tobias",16,15,15,1,0.325,R,4,1,0,MIN,93.8,93.8,6.2
 "Márquez, Germán",76,74,74,8,0.388,R,18,6,2,CWS,97.4,97.4,10.5
 "Nelson, Ryne",39,38,38,3,0.349,L,6,2,1,KC,97.4,97.4,7.7
-"Newcomb, Sean",25,25,25,2,0.365,R,8,2,0,HOU,100.0,100.0,8.0
+"Newcomb, Sean",26,26,26,2,0.36,R,8,2,0,ATL,100.0,100.0,7.7
 "Nola, Aaron",25,25,25,7,0.393,R,5,1,6,STL,100.0,100.0,28.0
 "Ober, Bailey",58,57,57,12,0.338,R,10,6,6,DET,98.3,98.3,20.7
 "Okert, Steven",14,13,13,1,0.189,R,1,0,1,CLE,92.9,92.9,7.1
@@ -281,7 +282,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Ort, Kaleb",13,13,13,2,0.278,R,1,2,0,CLE,100.0,100.0,15.4
 "Ortiz, Luis L.",34,34,34,4,0.349,L,10,3,1,STL,100.0,100.0,11.8
 "Orze, Eric",22,21,21,4,0.291,R,4,2,2,MIN,95.5,95.5,18.2
-"Paddack, Chris",57,57,57,7,0.334,R,10,3,4,TB,100.0,100.0,12.3
+"Paddack, Chris",62,62,62,9,0.349,R,12,4,5,CHC,100.0,100.0,14.5
 "Pagán, Emilio",23,23,23,7,0.28,R,0,4,3,PHI,100.0,100.0,30.4
 "Pallante, Andre",66,66,66,9,0.301,R,12,6,3,WSH,100.0,100.0,13.6
 "Palmquist, Carson",14,14,14,3,0.356,R,2,2,1,AZ,100.0,100.0,21.4
@@ -291,7 +292,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Pepiot, Ryan",61,60,60,9,0.302,R,7,6,3,DET,98.4,98.4,14.8
 "Peralta, Freddy",41,44,44,5,0.314,R,8,4,1,LAD,107.3,107.3,12.2
 "Peralta, Wandy",34,34,34,2,0.364,R,4,2,0,AZ,100.0,100.0,5.9
-"Peterson, David",48,47,47,5,0.362,R,7,4,1,MIL,97.9,97.9,10.4
+"Peterson, David",52,51,51,5,0.346,R,7,4,1,BAL,98.1,98.1,9.6
 "Pfaadt, Brandon",56,54,54,7,0.368,L,13,4,3,SD,96.4,96.4,12.5
 "Phillips, Tyler",22,21,21,1,0.277,R,5,1,0,CIN,95.5,95.5,4.5
 "Pivetta, Nick",50,50,50,7,0.403,R,15,1,6,AZ,100.0,100.0,14.0
@@ -301,15 +302,15 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Priester, Quinn",45,45,45,4,0.305,R,5,1,3,MIA,100.0,100.0,8.9
 "Pérez, Cionel",14,14,14,3,0.266,L,3,2,1,BOS,100.0,100.0,21.4
 "Pérez, Martín",12,11,11,2,0.447,R,2,1,1,BOS,91.7,91.7,16.7
-"Quantrill, Cal",32,31,31,5,0.321,R,6,3,2,MIL,96.9,96.9,15.6
+"Quantrill, Cal",36,35,35,5,0.316,R,7,3,2,CIN,97.2,97.2,13.9
 "Quintana, Jose",37,39,39,3,0.33,R,9,1,2,LAD,105.4,105.4,8.1
 "Ragans, Cole",24,31,31,3,0.311,R,7,2,1,STL,129.2,129.2,12.5
 "Rasmussen, Drew",45,46,46,4,0.313,R,10,2,2,MIN,102.2,102.2,8.9
 "Ray, Robbie",49,48,48,5,0.254,R,7,3,2,PHI,98.0,98.0,10.2
-"Rea, Colin",47,49,49,7,0.364,L,9,1,6,STL,104.3,104.3,14.9
+"Rea, Colin",52,54,54,7,0.356,L,10,1,6,MIN,103.8,103.8,13.5
 "Richardson, Lyon",17,16,16,1,0.331,R,1,1,0,MIA,94.1,94.1,5.9
 "Rocker, Kumar",27,26,26,2,0.326,R,7,1,1,LAA,96.3,96.3,7.4
-"Rodriguez, Eduardo",49,49,49,5,0.318,R,18,5,0,KC,100.0,100.0,10.2
+"Rodriguez, Eduardo",53,53,53,6,0.331,R,18,5,1,SD,100.0,100.0,11.3
 "Rodriguez, Elvin",11,12,12,4,0.391,R,1,1,3,HOU,109.1,109.1,36.4
 "Rodríguez, Manuel",16,16,16,2,0.315,R,2,1,1,MIA,100.0,100.0,12.5
 "Rodríguez, Randy",17,18,18,1,0.331,R,2,1,0,ATH,105.9,105.9,5.9
@@ -323,7 +324,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Ross, Joe",27,27,27,3,0.341,L,7,3,0,ATL,100.0,100.0,11.1
 "Roupp, Landen",52,50,50,5,0.306,R,9,4,1,PHI,96.2,96.2,9.6
 "Ruiz, José",11,11,11,0,0.265,R,5,0,0,COL,100.0,100.0,0.0
-"Rutledge, Jackson",12,11,11,0,0.287,L,3,0,0,LAD,91.7,91.7,0.0
+"Rutledge, Jackson",13,12,12,0,0.274,L,3,0,0,STL,92.3,92.3,0.0
 "Ryan, Joe",43,42,42,7,0.309,R,4,6,1,TB,97.7,97.7,16.3
 "Salazar, Eduardo",20,21,21,4,0.424,R,7,2,2,BOS,105.0,105.0,20.0
 "Sale, Chris",39,37,37,0,0.303,R,9,0,0,NYM,94.9,94.9,0.0
@@ -339,7 +340,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Schwellenbach, Spencer",59,60,60,9,0.344,R,8,4,5,PHI,101.7,101.7,15.3
 "Scott, Tanner",24,23,23,1,0.354,R,6,1,0,MIL,95.8,95.8,4.2
 "Scott, Tayler",17,17,17,3,0.425,R,1,2,1,MIA,100.0,100.0,17.6
-"Sears, JP",47,46,46,11,0.374,R,5,5,6,SF,97.9,97.9,23.4
+"Sears, JP",48,47,47,11,0.368,R,5,5,6,ATL,97.9,97.9,22.9
 "Senga, Kodai",34,33,33,3,0.285,R,4,2,1,WSH,97.1,97.1,8.8
 "Senzatela, Antonio",62,61,61,10,0.365,L,14,6,4,BOS,98.4,98.4,16.1
 "Severino, Luis",59,60,60,9,0.35,R,12,3,6,SF,101.7,101.7,15.3
@@ -354,22 +355,22 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Smith-Shawver, AJ",26,30,30,4,0.434,L,3,2,2,PHI,115.4,115.4,15.4
 "Snider, Collin",14,14,14,4,0.377,L,1,4,0,BAL,100.0,100.0,28.6
 "Soriano, José",53,51,51,5,0.33,L,17,4,1,TEX,96.2,96.2,9.4
-"Soroka, Michael",36,34,34,5,0.343,L,8,3,2,BOS,94.4,94.4,13.9
+"Soroka, Michael",37,35,35,5,0.348,L,8,3,2,STL,94.6,94.6,13.5
 "Soto, Gregory",10,10,10,1,0.38,R,1,1,0,NYM,100.0,100.0,10.0
 "Sousa, Bennett",11,11,11,2,0.362,R,2,2,0,CLE,100.0,100.0,18.2
 "Speier, Gabe",19,18,18,2,0.315,R,4,1,1,CHC,94.7,94.7,10.5
 "Spence, Mitch",45,45,45,9,0.4,L,8,5,4,ATL,100.0,100.0,20.0
 "Springs, Jeffrey",50,50,50,8,0.345,R,8,2,6,ATL,100.0,100.0,16.0
-"Stanek, Ryne",14,14,14,2,0.401,R,3,1,1,ATL,100.0,100.0,14.3
-"Sterner, Justin",13,14,14,1,0.351,L,4,0,1,SF,107.7,107.7,7.7
+"Stanek, Ryne",15,15,15,2,0.399,R,3,1,1,BAL,100.0,100.0,13.3
+"Sterner, Justin",14,15,15,1,0.333,R,4,0,1,ATL,107.1,107.1,7.1
 "Stewart, Brock",16,15,15,0,0.255,R,5,0,0,CHC,93.8,93.8,0.0
 "Strahm, Matt",18,18,18,1,0.278,R,5,1,0,ATL,100.0,100.0,5.6
 "Stratton, Chris",12,12,12,2,0.381,L,3,1,1,NYY,100.0,100.0,16.7
 "Strickland, Hunter",16,16,16,2,0.251,L,2,2,0,ATL,100.0,100.0,12.5
-"Strider, Spencer",28,27,27,3,0.338,R,5,3,0,BAL,96.4,96.4,10.7
-"Stroman, Marcus",13,13,13,4,0.397,L,2,3,1,NYM,100.0,100.0,30.8
-"Suarez, Robert",21,21,21,0,0.288,R,6,0,0,PHI,100.0,100.0,0.0
-"Sugano, Tomoyuki",54,54,54,9,0.38,R,11,4,5,TEX,100.0,100.0,16.7
+"Strider, Spencer",31,30,30,5,0.386,R,6,4,1,ATH,96.8,96.8,16.1
+"Stroman, Marcus",17,17,17,4,0.398,L,4,3,1,SEA,100.0,100.0,23.5
+"Suarez, Robert",22,22,22,0,0.275,R,6,0,0,AZ,100.0,100.0,0.0
+"Sugano, Tomoyuki",57,57,57,9,0.378,R,11,4,5,NYM,100.0,100.0,15.8
 "Suter, Brent",22,21,21,1,0.331,R,6,0,1,MIA,95.5,95.5,4.5
 "Suárez, Ranger",49,49,49,4,0.351,R,11,1,3,CIN,100.0,100.0,8.2
 "Sánchez, Cristopher",51,50,50,0,0.275,R,17,0,0,SF,98.0,98.0,0.0
@@ -377,7 +378,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Thielbar, Caleb",11,11,11,3,0.333,R,1,3,0,STL,100.0,100.0,27.3
 "Thompson, Ryan",16,16,16,2,0.349,L,6,2,0,CWS,100.0,100.0,12.5
 "Thornton, Trent",23,21,21,2,0.327,R,5,0,2,PIT,91.3,91.3,8.7
-"Topa, Justin",25,24,24,1,0.331,R,3,1,0,TB,96.0,96.0,4.0
+"Topa, Justin",29,28,28,2,0.323,R,3,2,0,CHC,96.6,96.6,6.9
 "Trivino, Lou",12,12,12,3,0.441,L,2,1,2,HOU,100.0,100.0,25.0
 "Uceta, Edwin",22,20,20,4,0.346,R,4,2,2,MIN,90.9,90.9,18.2
 "Ureña, José",16,16,16,3,0.546,L,3,2,1,NYM,100.0,100.0,18.8
@@ -392,7 +393,7 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Vest, Will",17,17,17,1,0.249,R,5,0,1,TB,100.0,100.0,5.9
 "Vásquez, Randy",52,54,54,6,0.307,L,7,2,4,TEX,103.8,103.8,11.5
 "Wacha, Michael",67,67,67,8,0.389,R,21,3,5,AZ,100.0,100.0,11.9
-"Waddell, Brandon",13,13,13,2,0.421,R,1,1,1,NYY,100.0,100.0,15.4
+"Waddell, Brandon",16,16,16,3,0.454,R,1,1,2,BAL,100.0,100.0,18.8
 "Walker, Ryan",16,15,15,2,0.218,L,0,2,0,PHI,93.8,93.8,12.5
 "Walker, Taijuan",26,25,25,0,0.27,L,4,0,0,SF,96.2,96.2,0.0
 "Walter, Brandon",17,16,16,0,0.29,R,4,0,0,COL,94.1,94.1,0.0
@@ -406,13 +407,13 @@ Player,Total_First_Pitches,First_Pitch_Swings,First_Pitch_InPlay,First_Pitch_XBH
 "Wheeler, Zack",45,44,44,5,0.286,L,8,3,2,CIN,97.8,97.8,11.1
 "Whitley, Forrest",12,12,12,5,0.55,R,2,3,2,DET,100.0,100.0,41.7
 "Whitlock, Garrett",15,15,15,2,0.391,R,2,2,0,WSH,100.0,100.0,13.3
-"Williams, Devin",11,11,11,1,0.428,L,2,1,0,TOR,100.0,100.0,9.1
+"Williams, Devin",12,12,12,1,0.396,L,2,1,0,SEA,100.0,100.0,8.3
 "Williams, Gavin",37,37,37,5,0.372,R,8,1,4,CHC,100.0,100.0,13.5
 "Williams, Trevor",45,50,50,5,0.392,R,14,3,2,DET,111.1,111.1,11.1
 "Wilson, Bryse",29,28,28,4,0.453,R,10,3,1,KC,96.6,96.6,13.8
 "Wilson, Justin",12,12,12,1,0.334,R,4,1,0,SEA,100.0,100.0,8.3
 "Wilson, Steven",13,13,13,1,0.353,R,5,1,0,LAD,100.0,100.0,7.7
-"Woo, Bryan",75,75,75,8,0.341,L,15,4,4,PIT,100.0,100.0,10.7
+"Woo, Bryan",78,78,78,8,0.341,L,16,4,4,NYY,100.0,100.0,10.3
 "Woods Richardson, Simeon",32,31,31,3,0.433,R,8,1,2,CHC,96.9,96.9,9.4
 "Wrobleski, Justin",24,24,24,5,0.467,R,4,1,4,HOU,100.0,100.0,20.8
 "Yamamoto, Yoshinobu",39,38,38,4,0.349,R,4,3,1,CWS,97.4,97.4,10.3
