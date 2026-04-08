@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 .streamlit/
 first_pitch_data_2025.csv
+first_pitch_hitters_2025.csv
 

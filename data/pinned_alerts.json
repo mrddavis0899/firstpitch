@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "Batter": "Zach Neto",
+    "Team": "Los Angeles Angels",
+    "Will Lead Off Inning": 3,
+    "Detected At": "10:16 PM",
+    "Date": "2026-04-07",
+    "Game": "ATL @ LAA",
+    "Outcome": ""
+  },
+  {
+    "Batter": "Trea Turner \ud83d\udd25\ud83d\udfe1",
+    "Team": "Philadelphia Phillies",
+    "Will Lead Off Inning": 6,
+    "Detected At": "10:58 PM",
+    "Date": "2026-04-07",
+    "Game": "PHI @ SF",
+    "Outcome": ""
+  },
+  {
+    "Batter": "Zach Neto",
+    "Team": "Los Angeles Angels",
+    "Will Lead Off Inning": 5,
+    "Detected At": "10:59 PM",
+    "Date": "2026-04-07",
+    "Game": "ATL @ LAA",
+    "Outcome": ""
+  },
+  {
+    "Batter": "Trea Turner \ud83d\udd25\ud83d\udfe1",
+    "Team": "Philadelphia Phillies",
+    "Will Lead Off Inning": 8,
+    "Detected At": "11:50 PM",
+    "Date": "2026-04-07",
+    "Game": "PHI @ SF",
+    "Outcome": ""
+  },
+  {
+    "Batter": "Mauricio Dub\u00f3n",
+    "Team": "Atlanta Braves",
+    "Will Lead Off Inning": 10,
+    "Detected At": "12:53 AM",
+    "Date": "2026-04-08",
+    "Game": "ATL @ LAA",
+    "Outcome": ""
+  }
+]

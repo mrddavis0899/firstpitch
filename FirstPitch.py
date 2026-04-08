@@ -15,8 +15,17 @@ include_ball = st.checkbox("Include 'Ball' as a Successful First Pitch?", value=
 
 # Refresh hot hitters
 if st.button("Refresh Hot Hitters"):
-    st.session_state.hot_hitters = get_hot_hitters(include_ball=include_ball)
+    hot_hitters = get_hot_hitters(include_ball=include_ball)
 
+    # Keep same behavior
+    st.session_state.hot_hitters = hot_hitters
+
+    # ✅ NEW: store ONLY top 5 for Live Tracker
+    top_5 = hot_hitters[hot_hitters["First Pitch PAs"] > 0].head(5)
+
+    st.session_state.hot_hitter_names = set(
+        top_5["Batter"].astype(str).str.strip().str.lower()
+    )
 # Display hot hitters if available
 if "hot_hitters" in st.session_state:
     hot_hitters = st.session_state.hot_hitters

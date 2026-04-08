@@ -18,17 +18,12 @@ def load_first_pitch_data():
 
     st.info("Fetching first pitch data...")
 
-    # Pull Statcast data
     df = statcast(start, end)
     df = df[df["pitch_number"] == 1].copy()
 
-    # Save full unfiltered first pitch data
     df.to_csv("first_pitch_data_2025.csv", index=False)
 
-    # Remove likely pitchers from batter dataset
     batter_df = df[~df["player_name"].str.contains(" P$", na=False)]
-
-    # Save hitters-only file
     batter_df.to_csv("first_pitch_hitters_2025.csv", index=False)
 
     return batter_df
@@ -79,7 +74,6 @@ if st.sidebar.button("🔄 Refresh Pitcher Data"):
         how="left"
     )
 
-    # ✅ Add pitcher team name safely
     pitcher_to_team = pitcher_data.groupby("pitcher")["home_team"].first().to_dict()
     merged["Team"] = merged["player_id"].map(pitcher_to_team)
 
@@ -93,6 +87,7 @@ if st.sidebar.button("🔄 Refresh Batter Data"):
         os.remove(CSV_FILE)
     st.cache_data.clear()
     st.rerun()
+
 if st.sidebar.button("🧼 One-Click Full Refresh and Regenerate"):
     files = [
         "first_pitch_data_2025.csv",
@@ -105,7 +100,6 @@ if st.sidebar.button("🧼 One-Click Full Refresh and Regenerate"):
     st.cache_data.clear()
     st.info("Generating fresh first pitch data... please wait.")
 
-    # Regenerate CSV
     df = load_first_pitch_data()
 
     if df.empty:
@@ -119,6 +113,23 @@ with st.spinner("Loading 2025 first pitch data..."):
 
 if df.empty:
     st.stop()
+
+# =========================
+# ✅ NEW: 2026 FILTER
+# =========================
+df["game_date"] = pd.to_datetime(df["game_date"], errors="coerce")
+
+years_available = sorted(df["game_date"].dt.year.dropna().unique(), reverse=True)
+
+season_filter = st.selectbox(
+    "Season",
+    ["All"] + [str(y) for y in years_available]
+)
+
+if season_filter != "All":
+    df = df[df["game_date"].dt.year == int(season_filter)]
+
+# =========================
 
 st.subheader("Search and Filter First Pitch Hitters")
 

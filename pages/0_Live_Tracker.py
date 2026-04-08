@@ -27,67 +27,56 @@ def connect_to_outcome_sheet():
 outcome_sheet = connect_to_outcome_sheet()
 
 def normalize(name):
-    return unidecode(name).strip().lower().replace("\xa0", " ")
-    return unidecode(name).lower().strip()
+    return unidecode(str(name)).strip().lower().replace("\xa0", " ")
 
 
 # ---------- HOT HITTER HIGHLIGHTING ----------
-def normalize(name):
-    return unidecode(name).lower().strip().replace("\xa0", " ")
+# Minimal-risk fix:
+# 1) Use dashboard-refreshed hot hitters from session_state when available
+# 2) Fall back to existing CSV logic when not available
+
+hot_session = set()
+try:
+    if "hot_hitters" in st.session_state:
+        hot_df = st.session_state.hot_hitters
+        if isinstance(hot_df, pd.DataFrame) and "Batter" in hot_df.columns:
+            hot_session = set(hot_df["Batter"].astype(str).map(normalize).dropna())
+except Exception as e:
+    st.sidebar.write("⚠️ Error loading session hot hitters:", e)
+
+hot_with_ball = set()
+hot_no_ball = set()
 
 try:
     df_with = pd.read_csv("data/hot_hitters_with_ball.csv")
     hot_with_ball = set(df_with["Batter"].astype(str).map(normalize).dropna())
 except Exception as e:
     st.sidebar.write("⚠️ Error loading hot_with_ball:", e)
-    hot_with_ball = set()
 
 try:
     df_no = pd.read_csv("data/hot_hitters_no_ball.csv")
     hot_no_ball = set(df_no["Batter"].astype(str).map(normalize).dropna())
 except Exception as e:
     st.sidebar.write("⚠️ Error loading hot_no_ball:", e)
-    hot_no_ball = set()
 
 
 def format_hot_name(name):
     norm = normalize(name)
+
+    # First priority: exact same hot hitter list currently shown on dashboard
+    if norm in hot_session:
+        return f"{name} 🔥"
+
+    # Fallback: keep old CSV behavior intact
     if norm in hot_with_ball:
         return f"{name} 🔥🟢"
     elif norm in hot_no_ball:
         return f"{name} 🔥🟡"
     return name
+
 
 target_hitters = st.session_state.get("target_hitters", set())
 normalized_targets = {normalize(name) for name in target_hitters}
-
-# ---------- HOT HITTER DEBUGGING ----------
-hot_with_ball = set()
-hot_no_ball = set()
-
-try:
-    df_with = pd.read_csv("data/hot_hitters_with_ball.csv")
-    df_with["Batter"] = df_with["Batter"].astype(str).apply(normalize)
-    hot_with_ball = set(df_with["Batter"])
-except Exception as e:
-    st.sidebar.write("⚠️ Error loading with-ball CSV:", e)
-
-try:
-    df_no = pd.read_csv("data/hot_hitters_no_ball.csv")
-    df_no["Batter"] = df_no["Batter"].astype(str).apply(normalize)
-    hot_no_ball = set(df_no["Batter"])
-except Exception as e:
-    st.sidebar.write("⚠️ Error loading no-ball CSV:", e)
-
-
-def format_hot_name(name):
-    norm = normalize(name)
-
-    if norm in hot_with_ball:
-        return f"{name} 🔥🟢"
-    elif norm in hot_no_ball:
-        return f"{name} 🔥🟡"
-    return name
 
 if "alerts_fired" not in st.session_state:
     st.session_state.alerts_fired = set()
